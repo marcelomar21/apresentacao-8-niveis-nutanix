@@ -142,20 +142,6 @@
         .fut-stats .stat-box .l { font-size: 0.68rem; letter-spacing: 1px; }
         .fut-foot { margin-top: 12px; font-size: 0.8rem; color: var(--muted); text-align: center; }
 
-        /* ══ SLIDE 13 — SDD ══ */
-        .sdd { width: 100%; max-width: 1240px; margin: 0 auto; }
-        .sdd .ill { width: 100%; height: auto; max-height: 330px; display: block; margin: 6px auto 18px; }
-        .sdd-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-        .sdd-row { border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-        .sdd-row.win { background: rgba(0,146,176,0.1); border: 1px solid rgba(44,196,224,0.3); }
-        .sdd-row.pain { background: rgba(255,122,92,0.06); border: 1px solid rgba(255,122,92,0.25); }
-        .sdd-row b { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; }
-        .sdd-row.win b { color: var(--teal2); } .sdd-row.pain b { color: var(--warn); }
-        .sdd-row span { font-size: 0.92rem; color: #e0e0e6; padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,0.04); cursor: default; }
-        .sdd-row span[data-src] { cursor: pointer; }
-        .sdd-quote { margin-top: 16px; font-size: 0.95rem; font-style: italic; color: var(--dim); text-align: center; }
-        .sdd-quote b { font-style: normal; color: var(--lilac); font-weight: 600; }
-
         /* ══ SLIDE 15 — OBRIGADO ══ */
         .thanks-slide::before { content: ''; position: absolute; width: 760px; height: 760px; background: radial-gradient(circle, rgba(120,85,250,0.14) 0%, transparent 70%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
         .thanks-wrap { position: relative; z-index: 1; text-align: center; }
@@ -210,8 +196,6 @@
             .who div { grid-template-columns: 72px 1fr; font-size: 0.82rem; }
             .fut-stats { grid-template-columns: 1fr 1fr; }
             .fut .tl { max-height: 200px; }
-            .sdd .ill { max-height: 200px; }
-            .sdd-rows { grid-template-columns: 1fr; }
             .thanks-title { font-size: 3.8rem; letter-spacing: -3px; }
             .qr-row { gap: 10px; flex-wrap: wrap; }
             .qr-card { padding: 12px; }
@@ -691,44 +675,6 @@
             </div>
         </div>
 
-        <!-- ⑬ SDD (ELI5) -->
-        <div class="slide" id="s13">
-            <div class="sdd">
-                <div class="label">Spec-Driven Development</div>
-                <h2 class="title" style="font-size:2.6rem;margin-bottom:4px">É como a <span class="grad">planta da casa</span>: primeiro o desenho, depois os tijolos.</h2>
-                <svg class="ill" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
-                    <g font-size="15" font-weight="700" fill="#fff" text-anchor="middle">
-                        <rect x="40" y="70" width="200" height="140" rx="18" fill="rgba(120,85,250,0.18)" stroke="#a188fc" stroke-width="3"/>
-                        <text x="140" y="112" font-size="30">📐</text><text x="140" y="150">Spec</text><text x="140" y="174" font-size="11" fill="#a188fc" font-weight="500">o quê e por quê</text><text x="140" y="192" font-size="11" fill="#a188fc" font-weight="500">critérios de aceite</text>
-                        <rect x="330" y="70" width="200" height="140" rx="18" fill="#1f1f20" stroke="#3a3a40" stroke-width="2"/>
-                        <text x="430" y="112" font-size="30">🧭</text><text x="430" y="150">Plano</text><text x="430" y="174" font-size="11" fill="#9c9ca6" font-weight="500">como: stack, contratos</text>
-                        <rect x="620" y="70" width="200" height="140" rx="18" fill="#1f1f20" stroke="#3a3a40" stroke-width="2"/>
-                        <text x="720" y="112" font-size="30">☑️</text><text x="720" y="150">Tarefas</text><text x="720" y="174" font-size="11" fill="#9c9ca6" font-weight="500">pequenas, paralelizáveis</text>
-                        <rect x="910" y="70" width="200" height="140" rx="18" fill="rgba(0,146,176,0.18)" stroke="#2cc4e0" stroke-width="3"/>
-                        <text x="1010" y="112" font-size="30">🧱</text><text x="1010" y="150">Código + testes</text><text x="1010" y="174" font-size="11" fill="#2cc4e0" font-weight="500">derivado da spec</text>
-                    </g>
-                    <g fill="none" stroke="#7855fa" stroke-width="4" stroke-linecap="round">
-                        <path d="M246 140 L322 140"/><path d="M310 130 L324 140 L310 150"/>
-                        <path d="M536 140 L612 140"/><path d="M600 130 L614 140 L600 150"/>
-                        <path d="M826 140 L902 140"/><path d="M890 130 L904 140 L890 150"/>
-                    </g>
-                    <g font-size="11" fill="#92dd23" text-anchor="middle" font-weight="700">
-                        <circle cx="284" cy="96" r="14" fill="#131313" stroke="#92dd23" stroke-width="2"/><text x="284" y="100">👁</text>
-                        <circle cx="574" cy="96" r="14" fill="#131313" stroke="#92dd23" stroke-width="2"/><text x="574" y="100">👁</text>
-                        <circle cx="864" cy="96" r="14" fill="#131313" stroke="#92dd23" stroke-width="2"/><text x="864" y="100">👁</text>
-                        <text x="574" y="60">humano revisa em cada passagem</text>
-                    </g>
-                    <path d="M1010 216 Q1010 270 600 270 Q140 270 140 216" fill="none" stroke="#a188fc" stroke-width="2" stroke-dasharray="6 6"/>
-                    <text x="600" y="292" text-anchor="middle" font-size="12" fill="#a188fc">se a planta muda, a casa muda — a spec é a fonte de verdade, o código é o build</text>
-                </svg>
-                <div class="sdd-rows">
-                    <div class="sdd-row win"><b>Ganha</b><span data-tip="Critérios de aceite escritos antes do código: o agente implementa contra um contrato, não contra a memória do prompt anterior.">contrato antes do código</span><span data-tip="A spec versionada sobrevive à sessão, ao dev e à troca de modelo — é o contexto (nível 3) que se acumula (nível 4).">contexto que não evapora</span><span data-tip="Tarefas pequenas e independentes são o pré-requisito para vários agentes trabalharem em paralelo (nível 7).">tarefas em paralelo</span></div>
-                    <div class="sdd-row pain"><b>Dói</b><span data-tip="Teste empírico de Colin Eberhardt (Scott Logic, nov/2025): ~4h com spec contra ~32 min no fluxo direto, para a mesma tarefa pequena. 'Drags you right back into the past!'" data-src="https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html" data-src-name="Scott Logic">burocracia em tarefa pequena</span><span data-tip="Isoform: manter spec e código em sincronia 'cria um imposto de manutenção que cresce com a complexidade'." data-src="https://isoform.ai/blog/the-limits-of-spec-driven-development" data-src-name="Isoform">spec que envelhece</span><span data-tip="Thoughtworks Radar vol. 34 (nov/2025): SDD no anel Assess, não Adopt — 'workflows elaborados e opinativos'." data-src="https://www.thoughtworks.com/radar/techniques/spec-driven-development" data-src-name="Thoughtworks Radar">ainda "Assess", não "Adopt"</span></div>
-                </div>
-                
-            </div>
-        </div>
-
         <!-- ⑭ COMO SUBIR -->
         <div class="slide centered alt" id="s14">
             <div style="width:100%;max-width:960px;margin:0 auto">
@@ -781,7 +727,7 @@
         <button class="nav-btn" onclick="prev()">← Anterior</button>
         <div class="nav-dots" id="dots"></div>
         <button class="nav-btn" onclick="next()">Próximo →</button>
-        <span class="slide-counter" id="counter">01/15</span>
+        <span class="slide-counter" id="counter">01/14</span>
     </div>
 
     <script>
