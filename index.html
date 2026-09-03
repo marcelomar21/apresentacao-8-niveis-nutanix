@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Os 8 Níveis — Engenharia Agêntica · Nutanix</title>
+    <title>Os 8 Níveis de Engenharia Agêntica</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -112,6 +112,7 @@
         .zone i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
         .levels-footer { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
         .levels-footer a { color: var(--dim); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+        .kbd { display: inline-block; font-family: var(--mono); font-size: 0.68rem; padding: 1px 7px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: #c4c4cc; }
 
         /* ══ SLIDES 4–11 — UM POR DEGRAU (ELI5) ══ */
         .lvl { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; width: 100%; max-width: 1280px; margin: 0 auto; align-items: center; }
@@ -130,27 +131,16 @@
         .chip { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #c4c4cc; }
         .chip.hi { border-color: var(--accent, var(--purple)); color: #fff; }
 
-        /* ══ SLIDE 12 — EVOLUÇÃO ══ */
-        .evo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 1180px; margin: 0 auto; }
-        .evo-col { border-radius: 18px; padding: 26px 22px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        .evo-col::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-        .evo-old  { background: rgba(120,120,140,0.08); border: 1px solid rgba(140,140,160,0.16); }
-        .evo-old::before { background: linear-gradient(90deg,#55555f,#8a8a96); }
-        .evo-vibe { background: rgba(255,122,92,0.05); border: 1px solid rgba(255,122,92,0.22); }
-        .evo-vibe::before { background: linear-gradient(90deg,#ff7a5c,#ffb057); }
-        .evo-sdd  { background: rgba(120,85,250,0.09); border: 1px solid rgba(120,85,250,0.35); }
-        .evo-sdd::before { background: linear-gradient(90deg,var(--deep),var(--purple),var(--teal2)); }
-        .evo-era { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 4px; }
-        .evo-old .evo-era { color: #8a8a96; } .evo-vibe .evo-era { color: var(--warn); } .evo-sdd .evo-era { color: var(--lilac); }
-        .evo-title { font-size: 1.55rem; font-weight: 800; color: white; margin-bottom: 14px; line-height: 1.15; }
-        .evo-stats { display: flex; flex-direction: column; gap: 9px; flex: 1; }
-        .evo-stat { display: flex; align-items: baseline; gap: 10px; }
-        .evo-val { font-family: var(--mono); font-weight: 700; font-size: 1.1rem; flex-shrink: 0; min-width: 62px; }
-        .evo-old .evo-val { color: #9a9aa6; } .evo-vibe .evo-val { color: var(--warn); } .evo-sdd .evo-val { color: var(--teal2); }
-        .evo-lbl { font-size: 0.78rem; color: var(--dim); line-height: 1.35; }
-        .evo-src { font-size: 0.58rem; color: rgba(255,255,255,0.22); margin-top: auto; padding-top: 12px; }
-        .evo-stat[data-src] { cursor: pointer; border-radius: 6px; padding: 3px 6px; margin: -3px -6px; transition: background 0.15s; }
-        .evo-stat[data-src]:hover { background: rgba(255,255,255,0.05); }
+        /* ══ SLIDE 12 — O FUTURO JÁ CHEGOU ══ */
+        .fut { width: 100%; max-width: 1260px; margin: 0 auto; }
+        .fut .tl { width: 100%; height: auto; max-height: 300px; display: block; margin: 4px 0 10px; }
+        .fut .tl g[data-tip] { cursor: pointer; }
+        .fut .tl g[data-tip]:hover circle.dot { r: 13; }
+        .fut-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+        .fut-stats .stat-box { padding: 18px 18px; }
+        .fut-stats .stat-box .n { font-size: 2.5rem; }
+        .fut-stats .stat-box .l { font-size: 0.68rem; letter-spacing: 1px; }
+        .fut-foot { margin-top: 12px; font-size: 0.8rem; color: var(--muted); text-align: center; }
 
         /* ══ SLIDE 13 — SDD ══ */
         .sdd { width: 100%; max-width: 1240px; margin: 0 auto; }
@@ -218,9 +208,8 @@
             .lvl-title { font-size: 1.9rem; margin-bottom: 12px; }
             .eli5 { font-size: 1.1rem; margin-bottom: 14px; }
             .who div { grid-template-columns: 72px 1fr; font-size: 0.82rem; }
-            .evo-grid { grid-template-columns: 1fr !important; gap: 12px; }
-            .evo-col { padding: 18px 16px; }
-            .evo-title { font-size: 1.2rem; }
+            .fut-stats { grid-template-columns: 1fr 1fr; }
+            .fut .tl { max-height: 200px; }
             .sdd .ill { max-height: 200px; }
             .sdd-rows { grid-template-columns: 1fr; }
             .thanks-title { font-size: 3.8rem; letter-spacing: -3px; }
@@ -284,14 +273,14 @@
             <div style="width:100%;max-width:960px;margin:0 auto">
                 <div class="label" style="text-align:center">O mapa</div>
                 <h2 class="title" style="text-align:center;font-size:2.9rem;margin-bottom:0">Os 8 Níveis de <span class="grad">Engenharia Agêntica</span></h2>
-                <p style="text-align:center;font-size:0.82rem;color:var(--muted);margin-top:6px">Passe o mouse em cada degrau</p>
+                <p style="text-align:center;font-size:0.82rem;color:var(--muted);margin-top:6px"><span class="kbd">↑</span> <span class="kbd">↓</span> percorrem os degraus · <span class="kbd">1</span>–<span class="kbd">8</span> pulam direto · ou passe o mouse</p>
                 <div class="staircase">
                     <div class="stair stair-8"><span class="stair-num">8</span><span class="stair-label">Autonomous Agent Teams</span><span class="stair-badge badge-front">fronteira</span></div>
                     <div class="stair stair-7"><span class="stair-num">7</span><span class="stair-label">Background Agents</span><span class="stair-badge badge-front">produção em 2026</span></div>
                     <div class="stair stair-6"><span class="stair-num">6</span><span class="stair-label">Harness Engineering</span></div>
                     <div class="stair stair-5"><span class="stair-num">5</span><span class="stair-label">MCP &amp; Skills</span></div>
-                    <div class="stair stair-4"><span class="stair-num">4</span><span class="stair-label">Compounding Engineering</span><span class="stair-badge badge-sdd">SDD compõe aqui</span></div>
-                    <div class="stair stair-3"><span class="stair-num">3</span><span class="stair-label">Context Engineering</span><span class="stair-badge badge-sdd">SDD começa aqui</span></div>
+                    <div class="stair stair-4"><span class="stair-num">4</span><span class="stair-label">Compounding Engineering</span></div>
+                    <div class="stair stair-3"><span class="stair-num">3</span><span class="stair-label">Context Engineering</span></div>
                     <div class="stair stair-2"><span class="stair-num">2</span><span class="stair-label">Agent IDE</span><span class="stair-badge badge-base">← a maioria está aqui</span></div>
                     <div class="stair stair-1"><span class="stair-num">1</span><span class="stair-label">Tab Complete</span><span class="stair-badge badge-base">← a maioria começa aqui</span></div>
                 </div>
@@ -301,7 +290,7 @@
                     <span class="zone"><i style="background:var(--deep)"></i>5–6 · Instrumentado</span>
                     <span class="zone"><i style="background:var(--teal2)"></i>7–8 · Autônomo</span>
                 </div>
-                <div class="levels-footer">Escada: <a href="https://www.bassimeledath.com/blog/levels-of-agentic-engineering" target="_blank" rel="noopener">"The 8 Levels of Agentic Engineering" — Bassim Eledath, mar/2026</a> · zonas e posição do SDD são leitura desta palestra</div>
+                <div class="levels-footer">Escada: <a href="https://www.bassimeledath.com/blog/levels-of-agentic-engineering" target="_blank" rel="noopener">"The 8 Levels of Agentic Engineering" — Bassim Eledath, mar/2026</a> · as zonas são leitura desta palestra</div>
             </div>
         </div>
 
@@ -456,7 +445,7 @@
                         <div><b>A IA faz</b><span>executa e já sabe o que aprendeu ontem</span></div>
                         <div><b>Onde para</b><span class="stop">ela ainda não alcança os sistemas da empresa</span></div>
                     </div>
-                    <div class="chips"><span class="chip hi">Plan → Work → Review → Codify</span><span class="chip">specs versionadas</span><span class="chip">ADRs</span><span class="chip">memória de projeto</span></div>
+                    <div class="chips"><span class="chip hi">Plan → Work → Review → Codify</span><span class="chip">regras versionadas</span><span class="chip">ADRs</span><span class="chip">memória de projeto</span></div>
                 </div>
             </div>
         </div>
@@ -617,52 +606,88 @@
             </div>
         </div>
 
-        <!-- ⑫ EVOLUÇÃO — ANTES / VIBE / SDD -->
+        <!-- ⑫ O FUTURO JÁ CHEGOU -->
         <div class="slide alt" id="s12">
-            <div style="width:100%;max-width:1180px;margin:0 auto">
-                <div class="label">A evolução do ciclo de desenvolvimento</div>
-                <h2 class="title" style="font-size:2.7rem;margin-bottom:16px">Antes. <span style="color:var(--warn)">Vibe Coding.</span> <span class="grad">Spec-Driven.</span></h2>
-                <div class="evo-grid">
-                    <div class="evo-col evo-old">
-                        <div class="evo-era">Antes</div>
-                        <div class="evo-title">Tradicional</div>
-                        <div class="evo-stats">
-                            <div class="evo-stat" data-tip="Projeto pequeno 2-4 meses, médio 4-8, grande/complexo 12-24+; por setor: saúde 12-18, fintech 9-15" data-src="https://scaleupally.io/blog/software-development-timeline/" data-src-name="ScaleUpAlly"><span class="evo-val">2-24m</span><span class="evo-lbl">ciclo de entrega, conforme o porte</span></div>
-                            <div class="evo-stat" data-tip="Projetos pequenos/médios: 5-7 pessoas (7 é o 'número ideal'); grandes: 8-15+. PM, devs, QA, designer, tech lead" data-src="https://onix-systems.com/blog/software-development-team-size-and-roles" data-src-name="Onix Systems"><span class="evo-val">5-7</span><span class="evo-lbl">pessoas por time (PM, QA, Dev, UX, Tech Lead)</span></div>
-                            <div class="evo-stat" data-tip="31% bem-sucedidos, 50% atrasam/estouram budget, 19% falham completamente" data-src="https://cdn1-public.infotech.com/agile/CHAOSReport2015-Final.pdf" data-src-name="Standish Group CHAOS Report 2015"><span class="evo-val">31%</span><span class="evo-lbl">taxa de sucesso de projetos</span></div>
-                            <div class="evo-stat" data-tip="Média geral: 32% do tempo codificando; 39% para 'software developers' puros. O resto é reunião, troca de contexto, espera" data-src="https://www.sonarsource.com/blog/how-much-time-do-developers-spend-actually-writing-code/" data-src-name="Sonar"><span class="evo-val">32%</span><span class="evo-lbl">do tempo efetivamente codificando</span></div>
-                            <div class="evo-stat" data-tip="CHAOS Report: 31% dos projetos bem-sucedidos, 50% 'desafiados' (atraso ou estouro de budget), 19% falham completamente" data-src="https://cdn1-public.infotech.com/agile/CHAOSReport2015-Final.pdf" data-src-name="Standish Group CHAOS Report 2015"><span class="evo-val">19%</span><span class="evo-lbl">dos projetos falham completamente</span></div>
-                            <div class="evo-stat" data-tip="44% das organizações reportam onboarding > 2 meses. Primeiro PR: ~1 semana" data-src="https://about.gitlab.com/the-source/platform/how-to-accelerate-developer-onboarding-and-why-it-matters/" data-src-name="GitLab"><span class="evo-val">2 meses</span><span class="evo-lbl">onboarding de novo dev</span></div>
-                        </div>
-                        <div class="evo-src">Clique nos dados para ver a fonte</div>
-                    </div>
-                    <div class="evo-col evo-vibe">
-                        <div class="evo-era">2024–25 · níveis 1–2</div>
-                        <div class="evo-title">Vibe Coding</div>
-                        <div class="evo-stats">
-                            <div class="evo-stat" data-tip="Karpathy: 'Accept All always, don't read the diffs anymore… I just see stuff, say stuff, run stuff'" data-src="https://simonwillison.net/2025/Feb/6/andrej-karpathy/" data-src-name="Karpathy (via Simon Willison)"><span class="evo-val">horas</span><span class="evo-lbl">para protótipo (parece rápido)</span></div>
-                            <div class="evo-stat" data-tip="'Not too bad for throwaway weekend projects' — o próprio Karpathy ressalvou que não é para produção" data-src="https://en.wikipedia.org/wiki/Vibe_coding" data-src-name="Wikipedia"><span class="evo-val">1</span><span class="evo-lbl">dev + "aceitar tudo" da IA</span></div>
-                            <div class="evo-stat" data-tip="Análise de relatos de praticantes na web (arXiv 2510.00328): 68% descrevem o resultado como 'rápido mas falho' e 19% como 'frágil'. É percepção, não medição de código" data-src="https://arxiv.org/html/2510.00328v1" data-src-name="arXiv 2510.00328"><span class="evo-val">87%</span><span class="evo-lbl">dos relatos: 'rápido mas falho' ou 'frágil'</span></div>
-                            <div class="evo-stat" data-tip="Estudo com 132 unidades comportamentais. 36% pularam QA completamente, 18% confiaram sem verificar" data-src="https://arxiv.org/html/2510.00328v1" data-src-name="arXiv 2510.00328"><span class="evo-val">11%</span><span class="evo-lbl">taxa de colapso/abandono</span></div>
-                            <div class="evo-stat" data-tip="Blog da Glide: um usuário acumulou US$ 350 em um único dia de vibe coding — o custo de token explode quando o agente itera sem plano" data-src="https://www.glideapps.com/blog/vibe-coding-cost" data-src-name="Glide Blog"><span class="evo-val">$350</span><span class="evo-lbl">gastos em 1 dia por um único usuário (caso real)</span></div>
-                            <div class="evo-stat" data-tip="Gartner prevê aumento de 2.500% nos defeitos de software via abordagens prompt-to-app até 2028" data-src="https://www.armorcode.com/report/gartner-predicts-2026-ai-potential-and-risks-emerge-in-software-engineering-technologies" data-src-name="Gartner Predicts 2026"><span class="evo-val">+2500%</span><span class="evo-lbl">defeitos previstos até 2028 (Gartner)</span></div>
-                        </div>
-                        <div class="evo-src">Clique nos dados para ver a fonte</div>
-                    </div>
-                    <div class="evo-col evo-sdd">
-                        <div class="evo-era">Agora · níveis 3–4 →</div>
-                        <div class="evo-title">Spec-Driven Development</div>
-                        <div class="evo-stats">
-                            <div class="evo-stat" data-tip="Wipro, no lançamento do AI-DLC (AWS DevSphere 2025, Bengaluru): 'four production-ready modules within just 20 hours' usando a metodologia e o Amazon Q Developer" data-src="https://www.aboutamazon.in/news/aws/aws-launches-new-ai-methodology-devsphere" data-src-name="About Amazon · AWS DevSphere 2025"><span class="evo-val">20h</span><span class="evo-lbl">para 4 módulos prontos para produção (Wipro, AI-DLC)</span></div>
-                            <div class="evo-stat" data-tip="Piloto AI-DLC numa instituição financeira europeia: de 1 PO + 12 devs entregando 15 features/sprint para 1 PO + 3 devs entregando 35 features/sprint" data-src="https://aws.amazon.com/blogs/industries/ai-driven-development-lifecycle-for-financial-services/" data-src-name="AWS Blog · Financial Services"><span class="evo-val">35 vs 15</span><span class="evo-lbl">features/sprint com 1/4 do time (piloto AI-DLC)</span></div>
-                            <div class="evo-stat" data-tip="Carta de Andy Jassy aos acionistas (2025): o motor de inferência 'Mantle' do Amazon Bedrock foi construído por 6 engenheiros em 76 dias, contra estimativa de ~40 pessoas por ~1 ano, com desenvolvimento orientado a spec (Kiro)" data-src="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" data-src-name="Amazon · carta aos acionistas 2025"><span class="evo-val">6 eng</span><span class="evo-lbl">em 76 dias, onde se estimava 40 por 1 ano (Bedrock)</span></div>
-                            <div class="evo-stat" data-tip="Thoughtworks Technology Radar vol. 34 (nov/2025): 'Spec-driven development' entra no radar (anel Assess) — vale experimentar, ainda não 'Adopt'" data-src="https://www.thoughtworks.com/radar/techniques/spec-driven-development" data-src-name="Thoughtworks Radar"><span class="evo-val">nov/25</span><span class="evo-lbl">entra no Radar da Thoughtworks (Assess)</span></div>
-                            <div class="evo-stat" data-tip="'Think 95% or higher accuracy in implementing specs on the first go' — META declarada pelo autor da Red Hat, não medição. Vale como régua, não como resultado" data-src="https://developers.redhat.com/articles/2025/10/22/how-spec-driven-development-improves-ai-coding-quality" data-src-name="Red Hat Developer"><span class="evo-val">95%+</span><span class="evo-lbl">acerto na 1ª tentativa — a meta do spec-driven (Red Hat)</span></div>
-                            <div class="evo-stat" data-tip="McKinsey: com IA generativa, devs codificam 35-45% mais rápido, refatoram 20-30% mais rápido e documentam na metade do tempo — ganhos por tarefa, não 10×" data-src="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/unleashing-developer-productivity-with-generative-ai" data-src-name="McKinsey"><span class="evo-val">35-45%</span><span class="evo-lbl">mais rápido para codificar com IA (McKinsey)</span></div>
-                        </div>
-                        <div class="evo-src">Clique nos dados para ver a fonte</div>
-                    </div>
+            <div class="fut">
+                <div class="label">Isso não é tendência — é o chão mudando</div>
+                <h2 class="title" style="font-size:2.7rem;margin-bottom:6px">De completar a linha a times de agentes: <span class="grad">5 anos.</span></h2>
+                <svg class="ill tl" viewBox="0 0 1220 256" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="40" y1="130" x2="1180" y2="130" stroke="#3a3a40" stroke-width="3"/>
+                    <path d="M1170 122 L1184 130 L1170 138" fill="none" stroke="#3a3a40" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="260" y1="130" x2="1140" y2="130" stroke="url(#tlg)" stroke-width="3"/>
+                    <defs><linearGradient id="tlg" x1="0" x2="1"><stop offset="0" stop-color="#7855fa"/><stop offset="1" stop-color="#2cc4e0"/></linearGradient></defs>
+                    <g data-tip="GitHub apresenta o Copilot como &quot;AI pair programmer&quot; em preview técnico (29/06/2021). Nasce o degrau 1." data-src="https://github.blog/news-insights/product-news/introducing-github-copilot-ai-pair-programmer/" data-src-name="GitHub Blog · 2021">
+                    <rect x="-8" y="18" width="176" height="100" fill="transparent"/>
+                    <line x1="80" y1="118" x2="80" y2="96" stroke="#8a8a96" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="80" cy="130" r="10" fill="#8a8a96"/><circle cx="80" cy="130" r="4" fill="#131313"/>
+                    <text x="80" y="34" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">jun/2021</text>
+                    <text x="80" y="58" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">GitHub Copilot</text>
+                    <text x="80" y="76" text-anchor="middle" font-size="11" fill="#9c9ca6">preview técnico</text>
+                    <rect x="48" y="82" width="64" height="16" rx="8" fill="#8a8a96" opacity="0.9"/><text x="80" y="94" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 1</text>
+                    </g>
+                    <g data-tip="Anthropic publica o Model Context Protocol como padrão aberto (25/11/2024) — o &quot;USB-C&quot; que liga agentes a sistemas." data-src="https://www.anthropic.com/news/model-context-protocol" data-src-name="Anthropic · nov/2024">
+                    <rect x="172" y="148" width="176" height="100" fill="transparent"/>
+                    <line x1="260" y1="142" x2="260" y2="164" stroke="#7855fa" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="260" cy="130" r="10" fill="#7855fa"/><circle cx="260" cy="130" r="4" fill="#131313"/>
+                    <rect x="228" y="164" width="64" height="16" rx="8" fill="#7855fa" opacity="0.9"/><text x="260" y="176" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 5</text>
+                    <text x="260" y="200" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">nov/2024</text>
+                    <text x="260" y="222" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">MCP</text>
+                    <text x="260" y="240" text-anchor="middle" font-size="11" fill="#9c9ca6">Anthropic abre o protocolo</text>
+                    </g>
+                    <g data-tip="Claude Code sai em research preview (24/02/2025); dias antes, Karpathy cunha &quot;vibe coding&quot;. O degrau 2 vira mainstream." data-src="https://www.anthropic.com/news/claude-3-7-sonnet" data-src-name="Anthropic · fev/2025">
+                    <rect x="352" y="18" width="176" height="100" fill="transparent"/>
+                    <line x1="440" y1="118" x2="440" y2="96" stroke="#c9bfff" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="440" cy="130" r="10" fill="#c9bfff"/><circle cx="440" cy="130" r="4" fill="#131313"/>
+                    <text x="440" y="34" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">fev/2025</text>
+                    <text x="440" y="58" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">Claude Code · &quot;vibe coding&quot;</text>
+                    <text x="440" y="76" text-anchor="middle" font-size="11" fill="#9c9ca6">agentes no terminal</text>
+                    <rect x="408" y="82" width="64" height="16" rx="8" fill="#c9bfff" opacity="0.9"/><text x="440" y="94" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 2</text>
+                    </g>
+                    <g data-tip="OpenAI lança o Codex na nuvem (16/05/2025) e o GitHub apresenta o Copilot coding agent (19/05/2025): agentes assíncronos que abrem PRs." data-src="https://openai.com/index/introducing-codex/" data-src-name="OpenAI · mai/2025">
+                    <rect x="532" y="148" width="176" height="100" fill="transparent"/>
+                    <line x1="620" y1="142" x2="620" y2="164" stroke="#0092b0" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="620" cy="130" r="10" fill="#0092b0"/><circle cx="620" cy="130" r="4" fill="#131313"/>
+                    <rect x="588" y="164" width="64" height="16" rx="8" fill="#0092b0" opacity="0.9"/><text x="620" y="176" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 7</text>
+                    <text x="620" y="200" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">mai/2025</text>
+                    <text x="620" y="222" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">Codex cloud · Copilot coding agent</text>
+                    <text x="620" y="240" text-anchor="middle" font-size="11" fill="#9c9ca6">issue → PR sem abrir o IDE</text>
+                    </g>
+                    <g data-tip="Anthropic lança Skills (16/10/2025): pastas de instruções e scripts que o agente carrega sob demanda." data-src="https://claude.com/blog/skills" data-src-name="Anthropic · out/2025">
+                    <rect x="712" y="18" width="176" height="100" fill="transparent"/>
+                    <line x1="800" y1="118" x2="800" y2="96" stroke="#7855fa" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="800" cy="130" r="10" fill="#7855fa"/><circle cx="800" cy="130" r="4" fill="#131313"/>
+                    <text x="800" y="34" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">out/2025</text>
+                    <text x="800" y="58" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">Agent Skills</text>
+                    <text x="800" y="76" text-anchor="middle" font-size="11" fill="#9c9ca6">procedimentos reutilizáveis</text>
+                    <rect x="768" y="82" width="64" height="16" rx="8" fill="#7855fa" opacity="0.9"/><text x="800" y="94" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 5</text>
+                    </g>
+                    <g data-tip="Junto com o Opus 4.6 (05/02/2026), Agent Teams entra em research preview no Claude Code — e a janela de contexto chega a 1M tokens." data-src="https://www.anthropic.com/news/claude-opus-4-6" data-src-name="Anthropic · fev/2026">
+                    <rect x="892" y="148" width="176" height="100" fill="transparent"/>
+                    <line x1="980" y1="142" x2="980" y2="164" stroke="#2cc4e0" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="980" cy="130" r="10" fill="#2cc4e0"/><circle cx="980" cy="130" r="4" fill="#131313"/>
+                    <rect x="948" y="164" width="64" height="16" rx="8" fill="#2cc4e0" opacity="0.9"/><text x="980" y="176" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 8</text>
+                    <text x="980" y="200" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">fev/2026</text>
+                    <text x="980" y="222" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">Agent Teams (preview)</text>
+                    <text x="980" y="240" text-anchor="middle" font-size="11" fill="#9c9ca6">agentes coordenando agentes</text>
+                    </g>
+                    <g data-tip="Blog oficial do MCP (28/07/2026): &quot;close to half-a-billion downloads a month&quot; nos SDKs Tier 1; TypeScript e Python passam de 1 bilhão de downloads." data-src="https://blog.modelcontextprotocol.io/posts/2026-07-28/" data-src-name="MCP blog · jul/2026">
+                    <rect x="1052" y="18" width="176" height="100" fill="transparent"/>
+                    <line x1="1140" y1="118" x2="1140" y2="96" stroke="#7855fa" stroke-width="2" opacity="0.6"/>
+                    <circle class="dot" cx="1140" cy="130" r="10" fill="#7855fa"/><circle cx="1140" cy="130" r="4" fill="#131313"/>
+                    <text x="1140" y="34" text-anchor="middle" font-size="12" fill="#a188fc" class="mono" font-weight="700">jul/2026</text>
+                    <text x="1140" y="58" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">MCP: 0,5 bi/mês</text>
+                    <text x="1140" y="76" text-anchor="middle" font-size="11" fill="#9c9ca6">downloads dos SDKs</text>
+                    <rect x="1108" y="82" width="64" height="16" rx="8" fill="#7855fa" opacity="0.9"/><text x="1140" y="94" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="700" letter-spacing="1">NÍVEL 5</text>
+                    </g>
+                </svg>
+                <div class="fut-stats">
+                    <div class="stat-box" data-tip="GitHub Octoverse 2025: '80% of new developers on GitHub use Copilot in their first week'." data-src="https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/" data-src-name="GitHub Octoverse 2025"><div class="n">80%</div><div class="l">dos novos devs no GitHub usam Copilot na 1ª semana</div></div>
+                    <div class="stat-box" data-tip="GitHub Octoverse 2025: '1+ million pull requests' criados pelo Copilot coding agent entre maio e setembro de 2025." data-src="https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/" data-src-name="GitHub Octoverse 2025"><div class="n">1M+</div><div class="l">PRs abertos por um agente em 5 meses (mai–set/2025)</div></div>
+                    <div class="stat-box" data-tip="Relatório 'The Next Era of Knowledge Work' (OpenAI, 02/06/2026): Codex passa de 5 milhões de usuários semanais ativos." data-src="https://www.constellationr.com/insights/news/openai-touts-broadening-codex-usage-5-million-weekly-active-users" data-src-name="Constellation Research · OpenAI"><div class="n">5 mi</div><div class="l">usuários semanais no Codex (jun/2026)</div></div>
+                    <div class="stat-box" data-tip="TechCrunch (12/08/2026), citando o CEO Scott Wu: Cognition (Devin) atingiu US$ 492 milhões de receita anualizada em maio/2026; rodada de US$ 1 bi a US$ 26 bi de valuation." data-src="https://techcrunch.com/2026/08/12/ai-coding-startup-cognition-reportedly-already-in-talks-to-raise-at-40b-valuation/" data-src-name="TechCrunch · ago/2026"><div class="n">$492M</div><div class="l">receita anualizada da Devin (mai/2026)</div></div>
+                    <div class="stat-box" data-tip="Anthropic Engineering: sistema multiagente (Opus 4 líder + subagentes Sonnet 4) superou o agente único em 90,2% no benchmark interno — usando ~15× os tokens de um chat." data-src="https://www.anthropic.com/engineering/multi-agent-research-system" data-src-name="Anthropic Engineering"><div class="n">+90%</div><div class="l">times de agentes vs. agente único — a 15× o custo</div></div>
                 </div>
+                <div class="fut-foot">Os degraus 5, 7 e 8 nasceram em menos de 18 meses. Clique em qualquer número para ver a fonte.</div>
             </div>
         </div>
 
@@ -700,7 +725,7 @@
                     <div class="sdd-row win"><b>Ganha</b><span data-tip="Critérios de aceite escritos antes do código: o agente implementa contra um contrato, não contra a memória do prompt anterior.">contrato antes do código</span><span data-tip="A spec versionada sobrevive à sessão, ao dev e à troca de modelo — é o contexto (nível 3) que se acumula (nível 4).">contexto que não evapora</span><span data-tip="Tarefas pequenas e independentes são o pré-requisito para vários agentes trabalharem em paralelo (nível 7).">tarefas em paralelo</span></div>
                     <div class="sdd-row pain"><b>Dói</b><span data-tip="Teste empírico de Colin Eberhardt (Scott Logic, nov/2025): ~4h com spec contra ~32 min no fluxo direto, para a mesma tarefa pequena. 'Drags you right back into the past!'" data-src="https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html" data-src-name="Scott Logic">burocracia em tarefa pequena</span><span data-tip="Isoform: manter spec e código em sincronia 'cria um imposto de manutenção que cresce com a complexidade'." data-src="https://isoform.ai/blog/the-limits-of-spec-driven-development" data-src-name="Isoform">spec que envelhece</span><span data-tip="Thoughtworks Radar vol. 34 (nov/2025): SDD no anel Assess, não Adopt — 'workflows elaborados e opinativos'." data-src="https://www.thoughtworks.com/radar/techniques/spec-driven-development" data-src-name="Thoughtworks Radar">ainda "Assess", não "Adopt"</span></div>
                 </div>
-                <div class="sdd-quote">"We keep the generated code and delete the prompt…" — a nova habilidade escassa é escrever a spec. <b>Sean Grove, OpenAI · 2025</b></div>
+                
             </div>
         </div>
 
@@ -712,15 +737,15 @@
                 <p style="text-align:center;font-size:0.82rem;color:var(--muted);margin-top:6px">Não pule degraus: nível 7 sem 3–4 é lixo em paralelo</p>
                 <div class="staircase" id="roadmap">
                     <div class="stair stair-8" data-tip="Papéis claros, contratos entre agentes (schemas, critérios), revisão adversarial. Humano aprova marcos. Métrica: incidentes por entrega autônoma."><span class="stair-num">8</span><span class="stair-label">times com contratos entre agentes</span></div>
-                    <div class="stair stair-7" data-tip="Agentes em CI: falhou o build → agente propõe fix. Issue com spec → PR em background. Métrica: PRs merged originados por agente."><span class="stair-num">7</span><span class="stair-label">agentes no CI e nas issues</span></div>
-                    <div class="stair stair-6" data-tip="Permissões e sandbox por agente, hooks que bloqueiam ações perigosas, evals com a spec como gabarito, custo por tarefa. Métrica: PRs aceitos sem alteração."><span class="stair-num">6</span><span class="stair-label">evals, guardrails, custo medido</span></div>
+                    <div class="stair stair-7" data-tip="Agentes em CI: falhou o build → agente propõe fix. Issue bem descrita → PR em background. Métrica: PRs merged originados por agente."><span class="stair-num">7</span><span class="stair-label">agentes no CI e nas issues</span></div>
+                    <div class="stair stair-6" data-tip="Permissões e sandbox por agente, hooks que bloqueiam ações perigosas, evals com critérios de aceite como gabarito, custo por tarefa. Métrica: PRs aceitos sem alteração."><span class="stair-num">6</span><span class="stair-label">evals, guardrails, custo medido</span></div>
                     <div class="stair stair-5" data-tip="MCP servers para Jira, banco, observabilidade, docs. Skills reutilizáveis: deploy, runbook, review. Métrica: tarefas resolvidas sem humano buscar dado."><span class="stair-num">5</span><span class="stair-label">conecte os sistemas via MCP</span></div>
-                    <div class="stair stair-4" data-tip="Spec por feature: o quê, por quê, critérios de aceite. Lições de review viram regra escrita no repo. Métrica: acerto na 1ª tentativa."><span class="stair-num">4</span><span class="stair-label">spec antes do código</span></div>
+                    <div class="stair stair-4" data-tip="Cada review vira regra escrita no repo (Plan → Work → Review → Codify). Critérios de aceite antes do código. Métrica: acerto na 1ª tentativa."><span class="stair-num">4</span><span class="stair-label">lições viram regras no repo</span></div>
                     <div class="stair stair-3" data-tip="AGENTS.md / CLAUDE.md na raiz: stack, convenções, comandos, o que não fazer. Revise o contexto em PR como se fosse código. Métrica: retrabalho por tarefa."><span class="stair-num">3</span><span class="stair-label">escreva o CLAUDE.md</span></div>
                     <div class="stair stair-2" data-tip="Agent IDE / CLI com permissão de editar e rodar. Comece por testes e refactors. Ninguém faz merge sem ler o diff. Métrica: % de PRs com agente."><span class="stair-num">2</span><span class="stair-label">dê poder de edição ao agente</span></div>
                     <div class="stair stair-1" data-tip="Autocomplete ligado para todo mundo. É o degrau grátis."><span class="stair-num">1</span><span class="stair-label">autocomplete para todos</span><span class="stair-badge badge-base">começa aqui</span></div>
                 </div>
-                <div class="levels-footer">Passe o mouse em cada degrau para ver o que fazer e o que medir</div>
+                <div class="levels-footer"><span class="kbd">↑</span> <span class="kbd">↓</span> percorrem os degraus (ou passe o mouse) para ver o que fazer e o que medir</div>
             </div>
         </div>
 
@@ -731,17 +756,17 @@
                 <div class="thanks-sub">Escaneie para acessar</div>
                 <div class="qr-row">
                     <a href="https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/" target="_blank" class="qr-card">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/&bgcolor=131313&color=7855fa" width="120" height="120" alt="Apresentação">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4AQMAAAADqqSRAAAABlBMVEUTExN4VfqFj1ciAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABhklEQVQ4jZ2UMW7EIBBFB7mgCxewzDVcrMSVKNNBt6WvhOSCaxBxAdxRWExmdhNF2iIsnu5ZAmbm+3+Al3KIQenTIOiI2LpsYYobTBWOHD0s44x7gGUKqul4b29xRJ0kinyVgxXJbGWWbzH1W2hm20D+9j/CtK+4LfNqad6f/Q3xQ5NErNKfRv+wwx1LAllEWj+PNM5wk5tOBml+r1qX1dceN4GsJ97p/DifxusclMpVfkCf9R7counf0dWVCyxO0gWe/Ys2znqPvk3RHzl8itRlm8CUpCvps3L/wwymujShJ30c39dhl27Ssz/bbPzRhtk2Q3dhtfQ2kD49drwfnSsg+Zm+DTNMWBaN/sDw6H+UF/YZrArP5zwdto12xfrQ2/IxzyDDbVXkN9dmWRv0mbRhf20iI3I+DDKVLPpcHeYgS58f+cH+KpSXmIaZ8ovynfRpOsgrTHnrF/YK9U9+eYfJlpKjzqmL3KZqWV/ed48pnzHNoCgv3QXmfRX225HrMz/H+KW+ARerhKWoV5C4AAAAAElFTkSuQmCC" width="120" height="120" alt="Apresentação">
                         <div class="qr-name">Apresentação</div>
                         <div class="qr-sub">HTML interativo</div>
                     </a>
                     <a href="https://www.bassimeledath.com/blog/levels-of-agentic-engineering" target="_blank" class="qr-card">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.bassimeledath.com/blog/levels-of-agentic-engineering&bgcolor=131313&color=2cc4e0" width="120" height="120" alt="Escada original">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4AQMAAAADqqSRAAAABlBMVEUTExMsxOB7ApNvAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABiElEQVQ4jZ2UMY7DIBBFB7mgWy5gmWtQrOQrUaaDLqWvhJSCaxD5AnZHETE74/VqpRQhEyq/wvj7/5kP8HQCYvIALmyjRmxd9jDkrVmMe9ERJjnjLYViK92br+0tztsdM6r1U05mGmck/W8x6V3UmgDX/Kdfwqx7mUbn9zWf/on4OBM4wMd/SC844A3RPvQCtl728gEn8Kq4AJSRaV02CqtvQyW9SdP7Uvb3BJRvMmbF+gVdNm1I/v7QcceqNzmHBnqxpL+NOqomZmPJAIUYKeeoSpd9+QbP+TRwF/4fIQPvm6WZYM/pvh5TJDOe+xn3JuZQ5rzQnYBlRp6HDhvSGspIeofKesV8v2UsQN6u9dAv5GCTM7Yc+3ro7zD3wcL58Ps8f1Kmb2+WnrE43aDP00x9YnPcV8RtEjMdHlvHc6xbn7k/InkLO/Xlsc8ypv5KQH3rKeNDv5TZL84HBtL/Hm/UP7hRx7cPmTtFYa5nXi+Z99Ly3pT5+qtfxOwXUj40EwlO/yT8dH4AUh+kcSfj/EoAAAAASUVORK5CYII=" width="120" height="120" alt="Escada original">
                         <div class="qr-name">A escada original</div>
                         <div class="qr-sub">Bassim Eledath · mar/2026</div>
                     </a>
                     <a href="https://www.linkedin.com/in/marcelo-mendes-8baa6611a/" target="_blank" class="qr-card">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.linkedin.com/in/marcelo-mendes-8baa6611a/&bgcolor=131313&color=a188fc" width="120" height="120" alt="LinkedIn">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4AQMAAAADqqSRAAAABlBMVEUTExOhiPzaIkf6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABeUlEQVQ4jZ2VMY6EMAxFjSjSLRdA5Bp0XIlyu9BRcqVIFLlGRlwgdBQo3m+G2WKKzXjThIcU8+1vHKK35Zj9SDUvZANzLjKeQ8pE476FiTo98+pdbPuRTzPnjzikSMNScfgn+8ayd9Sajxh6cZYTR/PSr2HUKywd9CPfu34qvpbdvGs2/2vSH+x4Ze5smHY+vveo54eXHA6XWzM1ucijRa7iZybDOK9lZ71h+Et8DvMXlRl6xc+p4sMlPUNy78Rf1Hmqsp5pOEbEGol6qmKZUS8Hf0jiQL+aqzXAHy8xncQrcaTLn0b82bOaEUe+TaJf+qHEjk8i+CO7ufxR8mM9CBrcrV/P5zDBn5f+Ekudmvv/5Gc+OranSTYOifkwUocSP9ALXYs4G4J0asYyaFtqUu1NLvM1P3J9EPb58kfH6AXMWwuP5cfLesa8nSLeif79M17s2TcJ/X7Pay2z9OR+mgOFKLLcPxZ5chzmrOfnfLa4H2rMzKjmt/UD3c6jW+p3nY4AAAAASUVORK5CYII=" width="120" height="120" alt="LinkedIn">
                         <div class="qr-name">Marcelo Mendes</div>
                         <div class="qr-sub">Palestrante · LinkedIn</div>
                     </a>
@@ -797,19 +822,26 @@
     function prev(){ if(cur>0){cur--;update();} }
     function go(i){ cur=i; update(); }
     document.addEventListener('keydown', e=>{
-        if(['ArrowRight',' ','Enter','PageDown','ArrowDown'].includes(e.key)){e.preventDefault();next();}
-        if(['ArrowLeft','PageUp','ArrowUp'].includes(e.key)){e.preventDefault();prev();}
+        const stp = steppers[slides[cur].id];
+        if (stp) {
+            if (e.key === 'ArrowUp')   { e.preventDefault(); stp.step(+1); return; }
+            if (e.key === 'ArrowDown') { e.preventDefault(); stp.step(-1); return; }
+            if (/^[1-8]$/.test(e.key)) { e.preventDefault(); stp.jump(parseInt(e.key,10)-1); return; }
+            if (e.key === 'Escape')    { e.preventDefault(); stp.clear(); return; }
+        }
+        if(['ArrowRight',' ','Enter','PageDown'].includes(e.key)){e.preventDefault();next();}
+        if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
     });
     let tx=null; document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
     document.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>70){ dx<0?next():prev(); } tx=null; },{passive:true});
 
-    // ── CAROUSEL (escadas) ──
-    function createCarousel(slideId, selector, interval, pauseSelector, reverse) {
+    // ── STEPPER MANUAL DAS ESCADAS (sem auto-avanço) ──
+    function createStepper(slideId, selector, pauseSelector, reverse) {
         let items = [...document.querySelectorAll(`#${slideId} ${selector}`)];
-        if (reverse) items = items.slice().reverse();
+        if (reverse) items = items.slice().reverse();          // items[0] = degrau 1
         if (!items.length) return null;
-        const car = { items, iv: null, idx: -1, ms: interval };
-        car.show = function(i) {
+        const st = { items, idx: -1 };
+        st.show = function(i) {
             this.items.forEach(a => a.classList.remove('ag-hl'));
             if (i < 0 || i >= this.items.length) return;
             const el = this.items[i]; el.classList.add('ag-hl');
@@ -821,23 +853,26 @@
                 t.style.left = Math.max(10, Math.min(r.left + r.width/2 - tw/2, innerWidth - tw - 10)) + 'px'; t.style.top = top + 'px';
             }
         };
-        car.start = function() { if (this.iv) return; this.idx = -1; this.iv = setInterval(() => { this.idx++; if (this.idx >= this.items.length) this.idx = 0; this.show(this.idx); }, this.ms); setTimeout(() => { this.idx = 0; this.show(0); }, 600); };
-        car.stop = function() { if (this.iv) { clearInterval(this.iv); this.iv = null; } this.items.forEach(a => a.classList.remove('ag-hl')); const t = document.getElementById('tip'); if (t) t.classList.remove('vis'); this.idx = -1; };
+        st.step = function(d) { const n = this.idx + d; if (n < 0) { this.clear(); return; } this.idx = Math.min(this.items.length - 1, n); this.show(this.idx); };
+        st.jump = function(i) { this.idx = Math.max(0, Math.min(this.items.length - 1, i)); this.show(this.idx); };
+        st.clear = function() { this.items.forEach(a => a.classList.remove('ag-hl')); const t = document.getElementById('tip'); if (t) t.classList.remove('vis'); this.idx = -1; };
         const zone = document.querySelector(`#${slideId} ${pauseSelector}`);
         if (zone) {
-            zone.addEventListener('mouseenter', () => { if (car.iv) { clearInterval(car.iv); car.iv = null; } car.items.forEach(a => a.classList.remove('ag-hl')); });
-            zone.addEventListener('mouseleave', () => { if (document.getElementById(slideId)?.classList.contains('active')) car.start(); });
+            zone.addEventListener('mouseenter', () => { st.items.forEach(a => a.classList.remove('ag-hl')); });   // o mouse assume
+            zone.addEventListener('mouseleave', () => { if (st.idx >= 0) st.show(st.idx); });                     // volta ao degrau do teclado
         }
-        return car;
+        // clique fixa o degrau
+        items.forEach((el, i) => el.addEventListener('click', () => st.jump(i)));
+        return st;
     }
-    const carousels = { s3: createCarousel('s3', '.stair', 2600, '.staircase', true), s14: createCarousel('s14', '.stair', 3200, '.staircase', true) };
+    const steppers = { s3: createStepper('s3', '.stair', '.staircase', true), s14: createStepper('s14', '.stair', '.staircase', true) };
     const animObserver = new MutationObserver(muts => {
         const seen = new Set();
         muts.forEach(m => {
             const el = m.target; if (seen.has(el)) return; seen.add(el);
             const active = el.classList.contains('active'); const was = el.dataset.wasActive === '1';
             if (active === was) return; el.dataset.wasActive = active ? '1' : '0';
-            if (carousels[el.id]) { if (active) carousels[el.id].start(); else carousels[el.id].stop(); }
+            if (steppers[el.id]) steppers[el.id].clear();   // entra e sai sempre limpo
         });
     });
     ['s3','s14'].forEach(id => { const el = document.getElementById(id); if (el) animObserver.observe(el, { attributes: true, attributeFilter: ['class'] }); });
