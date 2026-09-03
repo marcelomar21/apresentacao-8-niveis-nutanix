@@ -82,7 +82,16 @@
         .stat-box:hover { border-color: rgba(120,85,250,0.4); background: rgba(120,85,250,0.06); }
         .stat-box .n { font-size: 3rem; font-weight: 700; font-family: var(--mono); line-height: 1; background: linear-gradient(135deg, var(--purple), var(--teal2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .stat-box .l { font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; line-height: 1.4; }
-        .thesis { padding: 18px 22px; border-radius: 14px; background: linear-gradient(135deg, rgba(75,0,170,0.35), rgba(0,146,176,0.18)); border: 1px solid rgba(120,85,250,0.35); font-size: 1.1rem; line-height: 1.5; color: #fff; }
+        .split-h { font-size: 0.62rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 8px 2px; }
+        .split-h.good { color: var(--teal2); } .split-h.bad { color: var(--warn); margin-top: 14px; }
+        .stats-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stats-3 .stat-box { padding: 14px 14px 12px; }
+        .stats-3 .stat-box .n { font-size: 1.9rem; }
+        .stats-3 .stat-box .l { font-size: 0.62rem; letter-spacing: 1px; margin-top: 6px; }
+        .stats-3.good .stat-box .n { background: linear-gradient(135deg, var(--teal2), var(--green)); -webkit-background-clip: text; background-clip: text; }
+        .stats-3.bad .stat-box .n { background: linear-gradient(135deg, var(--warn), #ffb057); -webkit-background-clip: text; background-clip: text; }
+        .thesis .inl { color: var(--teal2); font-weight: 700; cursor: pointer; }
+        .thesis { margin-top: 14px; padding: 18px 22px; border-radius: 14px; background: linear-gradient(135deg, rgba(75,0,170,0.35), rgba(0,146,176,0.18)); border: 1px solid rgba(120,85,250,0.35); font-size: 1.1rem; line-height: 1.5; color: #fff; }
         .thesis strong { color: var(--teal2); }
 
         /* ══ ESCADA (slides 3 e 14) ══ */
@@ -133,7 +142,7 @@
 
         /* ══ SLIDE 12 — O FUTURO JÁ CHEGOU ══ */
         .fut { width: 100%; max-width: 1260px; margin: 0 auto; }
-        .fut .tl { width: 100%; height: auto; max-height: 300px; display: block; margin: 4px 0 10px; }
+        .fut .tl { width: 100%; height: auto; max-height: 260px; display: block; margin: 4px 0 10px; }
         .fut .tl g[data-tip] { cursor: pointer; }
         .fut .tl g[data-tip]:hover circle.dot { r: 13; }
         .fut-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
@@ -163,6 +172,14 @@
         #tip .tip-src a { color: var(--lilac); text-decoration: none; }
         #tip .tip-src a:hover { color: var(--teal2); text-decoration: underline; }
 
+        /* ── NOTAS DE RODAPÉ (fontes) ── */
+        .fn { font-family: var(--mono); font-size: 0.42em; margin-left: 4px; color: var(--lilac); -webkit-text-fill-color: var(--lilac); vertical-align: super; line-height: 0; font-weight: 700; }
+        .qauthor .fn, .evo-lbl .fn { font-size: 0.7em; }
+        .fn-list { position: absolute; left: 80px; right: 80px; bottom: 72px; display: flex; flex-wrap: wrap; gap: 3px 14px; justify-content: center; font-size: 0.58rem; color: var(--muted); line-height: 1.4; }
+        .fn-list a { color: var(--muted); text-decoration: none; white-space: nowrap; }
+        .fn-list a:hover { color: var(--dim); }
+        .fn-list b { color: var(--lilac); font-family: var(--mono); font-weight: 700; margin-right: 3px; }
+
         /* ── SVG helpers ── */
         .ill text { font-family: var(--sans); }
         .ill .mono { font-family: var(--mono); }
@@ -183,7 +200,7 @@
             .intro-badge { font-size: 0.7rem; padding: 8px 16px; margin-top: 28px; }
             .two-col { grid-template-columns: 1fr !important; gap: 16px; }
             .big-quote { font-size: 0.85rem; padding: 14px 16px; }
-            .stats-2x2 .n { font-size: 1.8rem; }
+            .stats-3 { grid-template-columns: 1fr; }
             .thesis { font-size: 0.9rem; }
             .staircase { gap: 4px; max-width: 100%; }
             .stair { width: 100% !important; height: 36px; padding: 0 10px; margin-left: 0 !important; }
@@ -205,6 +222,7 @@
             .nav-btn { font-size: 0.7rem; padding: 3px 8px; }
             .nav-dot { width: 5px; height: 5px; }
             #tip { max-width: 220px; font-size: 0.68rem; }
+            .fn-list { position: static; margin-top: 14px; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -231,23 +249,29 @@
                 <div>
                     <div class="label">Ponto de partida</div>
                     <h2 class="title">O modelo não é <span class="grad">o segredo.</span></h2>
-                    <div class="big-quote warn">
+                    <div class="big-quote warn" data-src="https://simonwillison.net/2025/Feb/6/andrej-karpathy/" data-src-name="Karpathy, fev/2025 (via Simon Willison)">
                         "I just see things, say things, run things, and copy-paste things, and it mostly works."
                         <div class="qauthor">— Andrej Karpathy, ao cunhar "vibe coding" · fev/2025</div>
                     </div>
-                    <div class="big-quote">
+                    <div class="big-quote" data-src="https://openai.com/index/harness-engineering/" data-src-name="OpenAI, Harness engineering, fev/2026">
                         Um time pequeno entregou ~1 milhão de linhas sem escrever uma à mão. O modelo não era o segredo — era o <em>harness</em>, a engenharia ao redor dele.
                         <div class="qauthor">— OpenAI, <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noopener" style="color:inherit">"Harness engineering"</a> · fev/2026 (paráfrase)</div>
                     </div>
                 </div>
                 <div>
-                    <div class="stats-2x2">
-                        <div class="stat-box" data-tip="Stack Overflow Developer Survey 2025: 84% dos devs usam ou planejam usar ferramentas de IA no fluxo de trabalho." data-src="https://survey.stackoverflow.co/2025/" data-src-name="Stack Overflow Survey 2025"><div class="n">84%</div><div class="l">dos devs usam ou vão usar IA</div></div>
-                        <div class="stat-box" data-tip="Na mesma pesquisa, 46% dizem desconfiar da precisão das respostas da IA; só 33% confiam." data-src="https://survey.stackoverflow.co/2025/" data-src-name="Stack Overflow Survey 2025"><div class="n">46%</div><div class="l">desconfiam do que a IA gera</div></div>
-                        <div class="stat-box" data-tip="METR, jul/2025: 16 devs experientes, 246 tarefas reais nos próprios repositórios, sorteadas com e sem IA (Cursor + Claude 3.5/3.7). Com IA levaram 19% MAIS tempo — e estimaram ter sido 20% mais rápidos. Sem contexto e método, a IA atrapalha quem já domina o código." data-src="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" data-src-name="METR · jul/2025"><div class="n">19%</div><div class="l">mais lentos com IA — devs experientes, no próprio código (METR)</div></div>
-                        <div class="stat-box" data-tip="Gartner (Predicts 2026): abordagens prompt-to-app sem engenharia ao redor podem gerar +2.500% de defeitos em software até 2028." data-src="https://www.armorcode.com/report/gartner-predicts-2026-ai-potential-and-risks-emerge-in-software-engineering-technologies" data-src-name="Gartner Predicts 2026"><div class="n">+2500%</div><div class="l">defeitos previstos até 2028 (Gartner)</div></div>
+                    <div class="split-h good">Quando tem engenharia ao redor</div>
+                    <div class="stats-3 good">
+                        <div class="stat-box" data-tip="McKinsey: com IA generativa, devs codificam 35-45% mais rápido, refatoram 20-30% mais rápido e documentam na metade do tempo — ganhos por tarefa." data-src="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/unleashing-developer-productivity-with-generative-ai" data-src-name="McKinsey, 2023"><div class="n">35–45%</div><div class="l">mais rápido para codificar</div></div>
+                        <div class="stat-box" data-tip="Carta de Andy Jassy aos acionistas (2025): o motor de inferência 'Mantle' do Amazon Bedrock foi construído por 6 engenheiros em 76 dias, contra estimativa de ~40 pessoas por ~1 ano." data-src="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" data-src-name="Amazon, carta aos acionistas 2025"><div class="n">76 dias</div><div class="l">6 engenheiros, onde se estimava 40 por 1 ano (Bedrock)</div></div>
+                        <div class="stat-box" data-tip="Piloto AI-DLC numa instituição financeira europeia: de 1 PO + 12 devs entregando 15 features/sprint para 1 PO + 3 devs entregando 35 features/sprint." data-src="https://aws.amazon.com/blogs/industries/ai-driven-development-lifecycle-for-financial-services/" data-src-name="AWS Blog, Financial Services"><div class="n">15→35</div><div class="l">features por sprint, com 1/4 do time</div></div>
                     </div>
-                    <div class="thesis">Todo mundo tem o mesmo modelo. A diferença entre <strong>demo</strong> e <strong>produção</strong> é a engenharia ao redor — e ela sobe em degraus.</div>
+                    <div class="split-h bad">Quando não tem</div>
+                    <div class="stats-3 bad">
+                        <div class="stat-box" data-tip="METR, jul/2025: 16 devs experientes, 246 tarefas reais nos próprios repositórios, sorteadas com e sem IA (Cursor + Claude 3.5/3.7). Com IA levaram 19% MAIS tempo — e estimaram ter sido 20% mais rápidos." data-src="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" data-src-name="METR, jul/2025"><div class="n">19%</div><div class="l">mais lentos: devs experientes no próprio código</div></div>
+                        <div class="stat-box" data-tip="Stack Overflow Developer Survey 2025: 46% dizem desconfiar da precisão das respostas da IA; só 33% confiam." data-src="https://survey.stackoverflow.co/2025/" data-src-name="Stack Overflow Survey 2025"><div class="n">46%</div><div class="l">dos devs desconfiam do que a IA gera</div></div>
+                        <div class="stat-box" data-tip="Gartner (Predicts 2026): abordagens prompt-to-app sem engenharia ao redor podem gerar +2.500% de defeitos em software até 2028." data-src="https://www.armorcode.com/report/gartner-predicts-2026-ai-potential-and-risks-emerge-in-software-engineering-technologies" data-src-name="Gartner Predicts 2026"><div class="n">+2500%</div><div class="l">defeitos previstos até 2028 (prompt-to-app)</div></div>
+                    </div>
+                    <div class="thesis"><span class="inl" data-tip="Stack Overflow Developer Survey 2025: 84% dos devs usam ou planejam usar ferramentas de IA no fluxo de trabalho." data-src="https://survey.stackoverflow.co/2025/" data-src-name="Stack Overflow Survey 2025">84%</span> dos devs já usam IA. Todo mundo tem o mesmo modelo — a diferença entre <strong>demo</strong> e <strong>produção</strong> é a engenharia ao redor, e ela sobe em degraus.</div>
                 </div>
             </div>
         </div>
@@ -670,7 +694,7 @@
                     <div class="stat-box" data-tip="Relatório 'The Next Era of Knowledge Work' (OpenAI, 02/06/2026): Codex passa de 5 milhões de usuários semanais ativos." data-src="https://www.constellationr.com/insights/news/openai-touts-broadening-codex-usage-5-million-weekly-active-users" data-src-name="Constellation Research · OpenAI"><div class="n">5 mi</div><div class="l">usuários semanais no Codex (jun/2026)</div></div>
                     <div class="stat-box" data-tip="TechCrunch (12/08/2026), citando o CEO Scott Wu: Cognition (Devin) atingiu US$ 492 milhões de receita anualizada em maio/2026; rodada de US$ 1 bi a US$ 26 bi de valuation." data-src="https://techcrunch.com/2026/08/12/ai-coding-startup-cognition-reportedly-already-in-talks-to-raise-at-40b-valuation/" data-src-name="TechCrunch · ago/2026"><div class="n">$492M</div><div class="l">receita anualizada da Devin (mai/2026)</div></div>
                 </div>
-                <div class="fut-foot">Os degraus 5, 7 e 8 nasceram em menos de 18 meses. Clique em qualquer número para ver a fonte.</div>
+                <div class="fut-foot">Os degraus 5, 7 e 8 nasceram em menos de 18 meses.</div>
             </div>
         </div>
 
@@ -860,6 +884,27 @@
         }
     });
     document.addEventListener('click', e => { const el = e.target.closest('[data-src]'); if (el && el.dataset.src && !e.target.closest('a')) window.open(el.dataset.src, '_blank'); });
+
+    // ── FONTES: índice sobrescrito em cada dado + lista numerada no rodapé do slide ──
+    slides.forEach(slide => {
+        const refs = [...slide.querySelectorAll('[data-src]')]; if (!refs.length) return;
+        const order = [];
+        refs.forEach(el => {
+            const url = el.dataset.src; let i = order.findIndex(o => o.url === url);
+            if (i < 0) { order.push({ url, name: el.dataset.srcName || url }); i = order.length - 1; }
+            const n = i + 1;
+            if (el instanceof SVGElement) {
+                const t = el.querySelector('text.mono') || el.querySelector('text');
+                if (t) { const ts = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); ts.setAttribute('baseline-shift', 'super'); ts.setAttribute('font-size', '8'); ts.setAttribute('fill', '#a188fc'); ts.textContent = ' ' + n; t.appendChild(ts); }
+            } else {
+                const host = el.querySelector('.n, .qauthor, .evo-val') || el;
+                const sup = document.createElement('sup'); sup.className = 'fn'; sup.textContent = n; host.appendChild(sup);
+            }
+        });
+        const list = document.createElement('div'); list.className = 'fn-list';
+        list.innerHTML = order.map((o, i) => { let h = ''; try { h = new URL(o.url).hostname.replace(/^www\./, ''); } catch {} return `<a href="${o.url}" target="_blank" rel="noopener"><b>${i + 1}</b>${o.name} · ${h}</a>`; }).join('');
+        slide.appendChild(list);
+    });
     </script>
 </body>
 </html>
