@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Os 8 Níveis — Engenharia Agêntica · Nutanix</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            /* Paleta Nutanix (site nutanix.com, 2026) */
+            --ink:    #131313;
+            --ink2:   #1f1f20;
+            --ink3:   #2a2a2e;
+            --purple: #7855fa;
+            --deep:   #4b00aa;
+            --teal:   #0092b0;
+            --teal2:  #2cc4e0;
+            --lilac:  #a188fc;
+            --green:  #92dd23;
+            --fog:    #f5f8fb;
+            --text:   #e9e9ee;
+            --dim:    #9c9ca6;
+            --muted:  #5f5f6a;
+            --warn:   #ff7a5c;
+            --sans: 'Montserrat', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--ink);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ── SLIDE SYSTEM ── */
+        .slides-wrapper { position: relative; width: 100%; height: 100%; }
+        .slide {
+            position: absolute;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: flex-start;
+            padding: 48px 80px 100px;
+            opacity: 0; visibility: hidden;
+            transform: translateX(50px);
+            transition: all 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .slide.active { opacity: 1; visibility: visible; transform: translateX(0); }
+        .slide.prev   { opacity: 0; transform: translateX(-50px); }
+        .slide.centered { align-items: center; justify-content: center; }
+        .slide.alt { background: var(--ink2); }
+
+        /* ── TYPOGRAPHY ── */
+        .label {
+            font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 4px;
+            color: var(--purple); margin-bottom: 10px;
+        }
+        .title {
+            font-size: 3.4rem; font-weight: 800;
+            letter-spacing: -1.5px; line-height: 1.05;
+            margin-bottom: 24px; color: #fff;
+        }
+        .grad {
+            background: linear-gradient(135deg, var(--purple), var(--lilac));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .grad-teal {
+            background: linear-gradient(135deg, var(--teal2), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .lead { font-size: 1.05rem; line-height: 1.7; color: var(--dim); max-width: 760px; }
+
+        /* ── PROGRESS / NAV ── */
+        .progress-line {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--deep), var(--purple), var(--teal2));
+            transition: width 0.5s ease; z-index: 1000;
+        }
+        .nav-pill {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 14px;
+            background: rgba(19,19,19,0.85);
+            border: 1px solid rgba(120,85,250,0.28);
+            border-radius: 50px; padding: 8px 18px;
+            backdrop-filter: blur(20px); z-index: 1000;
+        }
+        .nav-btn {
+            background: none; border: none; color: rgba(255,255,255,0.5);
+            cursor: pointer; font-family: var(--sans);
+            font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; transition: all 0.2s;
+        }
+        .nav-btn:hover { background: rgba(120,85,250,0.2); color: white; }
+        .nav-dots { display: flex; gap: 6px; align-items: center; }
+        .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.15); cursor: pointer; transition: all 0.3s; }
+        .nav-dot.active { background: var(--purple); width: 18px; border-radius: 3px; }
+        .slide-counter { font-size: 0.7rem; color: var(--muted); font-family: var(--mono); min-width: 36px; }
+
+        /* Marca discreta no canto */
+        .brand-corner {
+            position: fixed; top: 18px; left: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+        }
+        .brand-corner .x {
+            width: 22px; height: 22px; border-radius: 6px;
+            background: linear-gradient(135deg, var(--purple), var(--deep));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 800; font-size: 0.8rem; letter-spacing: 0;
+        }
+
+        /* ══════════════════════════════
+           SLIDE 1 — INTRO
+        ══════════════════════════════ */
+        #s1 canvas { position: absolute; inset: 0; pointer-events: none; }
+        .intro-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .intro-eyebrow {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 6px; text-transform: uppercase;
+            color: var(--purple); opacity: 0; animation: fadeUp 0.7s ease 0.2s forwards; margin-bottom: 18px;
+        }
+        .intro-title {
+            font-size: 9.5rem; font-weight: 800; letter-spacing: -7px; line-height: 0.95;
+            background: linear-gradient(135deg, var(--lilac) 0%, var(--purple) 40%, var(--teal2) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; background-size: 300% 300%;
+            animation: gradDrift 5s ease-in-out infinite, scaleIn 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards;
+            opacity: 0;
+        }
+        .intro-title small { display: block; font-size: 2.6rem; letter-spacing: -1px; font-weight: 700; margin-top: 6px; }
+        .intro-sub { font-size: 1.2rem; color: var(--dim); margin-top: 22px; letter-spacing: 0.2px; opacity: 0; animation: fadeUp 0.7s ease 0.8s forwards; }
+        .intro-badge {
+            margin-top: 48px; font-size: 0.88rem; color: var(--lilac);
+            background: rgba(120,85,250,0.12); border: 1px solid rgba(120,85,250,0.3);
+            padding: 10px 28px; border-radius: 30px;
+            opacity: 0; animation: fadeUp 0.7s ease 1.2s forwards;
+        }
+        @keyframes scaleIn { from { opacity:0; transform:scale(0.6); } to { opacity:1; transform:scale(1); } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes gradDrift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+
+        /* ══════════════════════════════
+           SLIDE 2 — O MODELO NÃO É O SEGREDO
+        ══════════════════════════════ */
+        .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; width: 100%; max-width: 1200px; margin: 0 auto; align-items: center; }
+        .big-quote {
+            padding: 22px 26px; background: rgba(120,85,250,0.07);
+            border-left: 3px solid var(--purple); border-radius: 0 14px 14px 0;
+            font-style: italic; color: #d4d4dc; line-height: 1.65; font-size: 1rem; margin-bottom: 16px;
+        }
+        .big-quote .qauthor { font-size: 0.78rem; color: var(--lilac); font-style: normal; margin-top: 10px; }
+        .big-quote.warn { background: rgba(255,122,92,0.06); border-left-color: var(--warn); }
+        .big-quote.warn .qauthor { color: var(--warn); }
+        .stats-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+        .stat-box { padding: 18px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; cursor: pointer; transition: all .2s; }
+        .stat-box:hover { border-color: rgba(120,85,250,0.4); background: rgba(120,85,250,0.06); }
+        .stat-box .n { font-size: 2.8rem; font-weight: 700; font-family: var(--mono); line-height: 1; background: linear-gradient(135deg, var(--purple), var(--teal2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-box .l { font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; line-height: 1.4; }
+        .thesis {
+            padding: 18px 22px; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(75,0,170,0.35), rgba(0,146,176,0.18));
+            border: 1px solid rgba(120,85,250,0.35);
+            font-size: 1.05rem; line-height: 1.5; color: #fff;
+        }
+        .thesis strong { color: var(--teal2); }
+
+        /* ══════════════════════════════
+           SLIDE 3 — A ESCADA
+        ══════════════════════════════ */
+        .staircase { display: flex; flex-direction: column; gap: 5px; width: 100%; max-width: 900px; margin: 14px 0 12px; }
+        .stair {
+            height: 40px; border-radius: 8px; display: flex; align-items: center; gap: 10px;
+            padding: 0 16px; position: relative; transition: filter 0.2s, transform 0.2s;
+            width: 400px; flex-shrink: 0; cursor: default;
+        }
+        .stair-8 { margin-left: 420px; } .stair-7 { margin-left: 360px; }
+        .stair-6 { margin-left: 300px; } .stair-5 { margin-left: 240px; }
+        .stair-4 { margin-left: 180px; } .stair-3 { margin-left: 120px; }
+        .stair-2 { margin-left: 60px; }  .stair-1 { margin-left: 0; }
+        /* zonas */
+        .stair-1 { background: rgba(120,120,140,0.16); border: 1px solid rgba(140,140,160,0.2); }
+        .stair-2 { background: rgba(130,120,170,0.22); border: 1px solid rgba(150,140,190,0.26); }
+        .stair-3 { background: rgba(120,85,250,0.30); border: 1px solid rgba(120,85,250,0.42); }
+        .stair-4 { background: rgba(120,85,250,0.42); border: 1px solid rgba(120,85,250,0.55); }
+        .stair-5 { background: rgba(75,0,170,0.62);  border: 1px solid rgba(120,85,250,0.6); }
+        .stair-6 { background: rgba(75,0,170,0.80);  border: 1px solid rgba(179,161,255,0.55); box-shadow: 0 0 22px rgba(120,85,250,0.25); }
+        .stair-7 { background: rgba(0,146,176,0.45); border: 1px solid rgba(44,196,224,0.5); }
+        .stair-8 { background: rgba(0,146,176,0.70); border: 1px solid rgba(44,196,224,0.7); box-shadow: 0 0 22px rgba(44,196,224,0.25); }
+        .stair:hover, .stair.ag-hl { filter: brightness(1.3); transform: scaleX(1.012); transform-origin: left; }
+        .stair.ag-hl { box-shadow: 0 0 18px rgba(120,85,250,0.35); }
+        .stair-num { font-size: 0.7rem; font-weight: 700; font-family: var(--mono); flex-shrink: 0; width: 14px; color: rgba(255,255,255,0.7); }
+        .stair-label { font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.95); }
+        .stair-1 .stair-label, .stair-2 .stair-label { color: rgba(255,255,255,0.6); }
+        .stair-badge { margin-left: auto; font-size: 0.58rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+        .badge-base  { background: rgba(150,150,170,0.12); color: #9a9aa6; border: 1px solid rgba(150,150,170,0.22); }
+        .badge-sdd   { background: rgba(179,161,255,0.18); color: var(--lilac); border: 1px solid rgba(179,161,255,0.4); }
+        .badge-front { background: rgba(44,196,224,0.14); color: var(--teal2); border: 1px solid rgba(44,196,224,0.35); }
+        .zones { display: flex; gap: 10px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+        .zone { font-size: 0.68rem; padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); color: var(--dim); display: flex; align-items: center; gap: 7px; }
+        .zone i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+        .levels-footer { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+        .levels-footer a { color: var(--dim); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+
+        /* ══════════════════════════════
+           SLIDES 4–7 — PARES DE NÍVEIS
+        ══════════════════════════════ */
+        .pair-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 14px; }
+        .pair-head .title { margin-bottom: 0; font-size: 2.7rem; }
+        .pair-zone { font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; }
+        .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; width: 100%; max-width: 1240px; margin: 0 auto; }
+        .lvl-card {
+            border-radius: 18px; padding: 22px 24px; position: relative; overflow: hidden;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px 22px; align-content: start;
+        }
+        .lvl-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, var(--purple)); }
+        .lvl-card .lvl-top { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+        .lvl-n { font-family: var(--mono); font-size: 1.9rem; font-weight: 700; color: var(--accent, var(--purple)); line-height: 1; }
+        .lvl-name { font-size: 1.35rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+        .lvl-tag { margin-left: auto; font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+        .lvl-def { grid-column: 1 / -1; font-size: 0.92rem; line-height: 1.55; color: #cfcfd8; }
+        .lvl-h { font-size: 0.62rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent, var(--purple)); margin-bottom: 7px; }
+        .lvl-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .lvl-list li { font-size: 0.78rem; color: var(--dim); line-height: 1.4; padding-left: 14px; position: relative; }
+        .lvl-list li::before { content: ''; position: absolute; left: 0; top: 0.5em; width: 6px; height: 6px; border-radius: 2px; background: var(--accent, var(--purple)); opacity: 0.8; }
+        .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+        .chip { font-size: 0.66rem; padding: 3px 9px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #c4c4cc; cursor: default; transition: all .2s; }
+        .chip:hover { border-color: var(--accent, var(--purple)); color: #fff; }
+        .lvl-unlock { grid-column: 1 / -1; margin-top: 4px; padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; color: #ddd; background: rgba(120,85,250,0.08); border: 1px dashed rgba(120,85,250,0.35); }
+        .lvl-unlock b { color: var(--accent, var(--purple)); }
+        .pair-note { width: 100%; max-width: 1240px; margin: 14px auto 0; font-size: 0.85rem; color: var(--dim); display: flex; gap: 10px; align-items: center; }
+        .pair-note b { color: #fff; }
+        .pair-note .ic { font-size: 1.1rem; }
+
+        /* ══════════════════════════════
+           SLIDE 8 — EVOLUÇÃO (antes / vibe / SDD)
+        ══════════════════════════════ */
+        .evo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 1180px; margin: 0 auto; }
+        .evo-col { border-radius: 18px; padding: 26px 22px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .evo-col::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .evo-old  { background: rgba(120,120,140,0.08); border: 1px solid rgba(140,140,160,0.16); }
+        .evo-old::before { background: linear-gradient(90deg,#55555f,#8a8a96); }
+        .evo-vibe { background: rgba(255,122,92,0.05); border: 1px solid rgba(255,122,92,0.22); }
+        .evo-vibe::before { background: linear-gradient(90deg,#ff7a5c,#ffb057); }
+        .evo-sdd  { background: rgba(120,85,250,0.09); border: 1px solid rgba(120,85,250,0.35); }
+        .evo-sdd::before { background: linear-gradient(90deg,var(--deep),var(--purple),var(--teal2)); }
+        .evo-era { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 4px; }
+        .evo-old .evo-era { color: #8a8a96; } .evo-vibe .evo-era { color: var(--warn); } .evo-sdd .evo-era { color: var(--lilac); }
+        .evo-title { font-size: 1.55rem; font-weight: 800; color: white; margin-bottom: 14px; line-height: 1.15; }
+        .evo-stats { display: flex; flex-direction: column; gap: 9px; flex: 1; }
+        .evo-stat { display: flex; align-items: baseline; gap: 10px; }
+        .evo-val { font-family: var(--mono); font-weight: 700; font-size: 1.1rem; flex-shrink: 0; min-width: 62px; }
+        .evo-old .evo-val { color: #9a9aa6; } .evo-vibe .evo-val { color: var(--warn); } .evo-sdd .evo-val { color: var(--teal2); }
+        .evo-lbl { font-size: 0.78rem; color: var(--dim); line-height: 1.35; }
+        .evo-src { font-size: 0.58rem; color: rgba(255,255,255,0.22); margin-top: auto; padding-top: 12px; }
+        .evo-stat[data-src] { cursor: pointer; border-radius: 6px; padding: 3px 6px; margin: -3px -6px; transition: background 0.15s; }
+        .evo-stat[data-src]:hover { background: rgba(255,255,255,0.05); }
+
+        /* ══════════════════════════════
+           SLIDE 9 — SDD EM AÇÃO
+        ══════════════════════════════ */
+        .sdd-flow { display: flex; align-items: stretch; gap: 0; margin: 6px 0 16px; width: 100%; max-width: 1240px; }
+        .sdd-step { flex: 1; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); position: relative; transition: all .25s; }
+        .sdd-step.on { background: rgba(120,85,250,0.14); border-color: rgba(120,85,250,0.5); box-shadow: 0 0 18px rgba(120,85,250,0.2); }
+        .sdd-step .k { font-family: var(--mono); font-size: 0.6rem; color: var(--purple); font-weight: 700; }
+        .sdd-step .nm { font-size: 0.95rem; font-weight: 700; color: #fff; margin: 2px 0 3px; }
+        .sdd-step .ar { font-size: 0.68rem; color: var(--dim); font-family: var(--mono); }
+        .sdd-arrow { align-self: center; padding: 0 6px; color: rgba(120,85,250,0.6); font-size: 1rem; }
+        .terminal { background: #0e0e10; border: 1px solid rgba(120,85,250,0.3); border-radius: 14px; overflow: hidden; font-family: var(--mono); }
+        .t-bar { background: rgba(255,255,255,0.04); padding: 9px 14px; display: flex; align-items: center; gap: 7px; }
+        .td { width: 10px; height: 10px; border-radius: 50%; }
+        .td.r{background:#ff5f57;} .td.y{background:#febc2e;} .td.g{background:#28c840;}
+        .t-ttl { flex: 1; text-align: center; font-size: 0.66rem; color: var(--muted); font-family: var(--sans); }
+        .t-prompt { color: var(--purple); }
+        .t-cmd { color: #e6e6ee; }
+        .t-out { color: var(--dim); font-size: 0.78rem; display: block; }
+        .t-cur { display: inline-block; width: 7px; height: 0.9em; background: var(--purple); vertical-align: text-bottom; margin-left: 2px; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+        #t9-body { max-height: 330px; min-height: 330px; overflow-y: auto; scroll-behavior: smooth; padding: 16px 20px; font-size: 0.78rem; line-height: 1.75; }
+        #t9-body::-webkit-scrollbar { width: 3px; }
+        #t9-body::-webkit-scrollbar-thumb { background: rgba(120,85,250,0.35); border-radius: 2px; }
+        .doc-preview { background: rgba(19,19,19,0.95); border: 1px solid rgba(120,85,250,0.22); border-radius: 14px; overflow: hidden; height: 100%; min-height: 372px; display: flex; flex-direction: column; }
+        .doc-tab { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(120,85,250,0.1); border-bottom: 1px solid rgba(120,85,250,0.18); font-size: 0.66rem; font-family: var(--mono); color: var(--lilac); }
+        .doc-body { padding: 14px 18px; flex: 1; overflow-y: auto; font-size: 0.7rem; font-family: var(--mono); line-height: 1.55; color: #b4b4bc; transition: opacity 0.3s; max-height: 330px; }
+        .doc-body .dh1 { color: #fff; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+        .doc-body .dh2 { color: var(--lilac); font-size: 0.76rem; font-weight: 700; margin: 10px 0 4px; }
+        .doc-body .dmeta { color: #5f5f6a; font-size: 0.6rem; }
+        .doc-body .dok { color: var(--green); }
+        .doc-body .dwarn { color: var(--warn); }
+        .doc-body .dtbl { width: 100%; border-collapse: collapse; margin: 4px 0 8px; font-size: 0.64rem; }
+        .doc-body .dtbl td, .doc-body .dtbl th { padding: 3px 8px; border: 1px solid rgba(120,85,250,0.18); text-align: left; }
+        .doc-body .dtbl th { background: rgba(120,85,250,0.1); color: var(--lilac); }
+        .doc-body::-webkit-scrollbar { width: 3px; }
+        .doc-body::-webkit-scrollbar-thumb { background: rgba(120,85,250,0.35); border-radius: 2px; }
+        .sdd-tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; width: 100%; max-width: 1240px; align-items: center; }
+        .sdd-tools .lbl { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+        .tool { font-size: 0.72rem; padding: 5px 11px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #d0d0d8; cursor: pointer; transition: all .2s; text-decoration: none; }
+        .tool b { color: #fff; }
+        .tool:hover { border-color: var(--purple); background: rgba(120,85,250,0.1); }
+        .kbd-hint { font-size: 0.62rem; color: var(--muted); margin-left: auto; font-family: var(--mono); }
+
+        /* ══════════════════════════════
+           SLIDE 10 — SDD: GANHOS E LIMITES
+        ══════════════════════════════ */
+        .sdd-cols { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 20px; width: 100%; max-width: 1240px; margin: 0 auto; align-items: start; }
+        .col-card { border-radius: 16px; padding: 20px 22px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); height: 100%; }
+        .col-card h3 { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+        .col-card.win h3 { color: var(--teal2); } .col-card.pain h3 { color: var(--warn); } .col-card.fit h3 { color: var(--lilac); }
+        .win-list, .pain-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+        .win-list li, .pain-list li { display: flex; gap: 10px; align-items: baseline; font-size: 0.82rem; color: #d0d0d8; line-height: 1.4; border-radius: 6px; padding: 3px 6px; margin: -3px -6px; }
+        .win-list li[data-src], .pain-list li[data-src] { cursor: pointer; }
+        .win-list li:hover, .pain-list li:hover { background: rgba(255,255,255,0.04); }
+        .win-list .v { font-family: var(--mono); font-weight: 700; color: var(--teal2); min-width: 56px; flex-shrink: 0; }
+        .pain-list .v { color: var(--warn); flex-shrink: 0; }
+        .fit-ladder { display: flex; flex-direction: column; gap: 6px; }
+        .fit-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 9px; font-size: 0.78rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: var(--dim); }
+        .fit-row b { font-family: var(--mono); color: #fff; width: 16px; }
+        .fit-row.core { background: rgba(120,85,250,0.16); border-color: rgba(120,85,250,0.5); color: #fff; }
+        .fit-row.enables { background: rgba(0,146,176,0.14); border-color: rgba(44,196,224,0.35); color: #e6f7fb; }
+        .fit-row .tag { margin-left: auto; font-size: 0.56rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+        .fit-row.core .tag { color: var(--lilac); } .fit-row.enables .tag { color: var(--teal2); }
+        .quote-bar { width: 100%; max-width: 1240px; margin: 16px auto 0; padding: 14px 20px; border-radius: 12px; background: rgba(120,85,250,0.07); border-left: 3px solid var(--purple); font-style: italic; color: #d4d4dc; font-size: 0.92rem; line-height: 1.5; display: flex; flex-direction: column; gap: 4px; }
+        .quote-bar .qa { font-style: normal; font-size: 0.72rem; color: var(--lilac); }
+        .quote-bar a { color: var(--teal2); }
+
+        /* ══════════════════════════════
+           SLIDE 11 — COMO SUBIR
+        ══════════════════════════════ */
+        .ladder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-width: 1240px; margin: 0 auto; }
+        .step-card { border-radius: 14px; padding: 16px 16px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); position: relative; transition: all .25s; }
+        .step-card:hover { transform: translateY(-4px); border-color: rgba(120,85,250,0.45); }
+        .step-card .from-to { font-family: var(--mono); font-size: 0.72rem; color: var(--purple); font-weight: 700; margin-bottom: 4px; }
+        .step-card .st { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.2; }
+        .step-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .step-card li { font-size: 0.74rem; color: var(--dim); line-height: 1.4; padding-left: 14px; position: relative; }
+        .step-card li::before { content: '→'; position: absolute; left: 0; color: var(--teal2); }
+        .step-card .kpi { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.66rem; color: var(--muted); }
+        .step-card .kpi b { color: var(--teal2); font-weight: 600; }
+        .ladder-foot { width: 100%; max-width: 1240px; margin: 16px auto 0; display: flex; gap: 14px; align-items: center; font-size: 0.85rem; color: var(--dim); }
+        .ladder-foot .pill { padding: 6px 14px; border-radius: 20px; background: rgba(120,85,250,0.12); border: 1px solid rgba(120,85,250,0.35); color: #fff; font-size: 0.78rem; }
+
+        /* ══════════════════════════════
+           SLIDE 12 — OBRIGADO
+        ══════════════════════════════ */
+        #s12::before { content: ''; position: absolute; width: 760px; height: 760px; background: radial-gradient(circle, rgba(120,85,250,0.14) 0%, transparent 70%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .thanks-wrap { position: relative; z-index: 1; text-align: center; }
+        .thanks-title { font-size: 7rem; font-weight: 800; letter-spacing: -5px; line-height: 1; background: linear-gradient(135deg, var(--purple), var(--teal2), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; background-size: 200% 200%; animation: gradDrift 3s ease-in-out infinite; margin-bottom: 10px; }
+        .thanks-sub { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 36px; }
+        .qr-row { display: flex; gap: 22px; justify-content: center; margin-bottom: 34px; }
+        .qr-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-decoration: none; transition: all 0.35s; }
+        .qr-card:hover { border-color: var(--purple); background: rgba(120,85,250,0.1); transform: translateY(-8px); box-shadow: 0 18px 38px rgba(120,85,250,0.22); }
+        .qr-card img { border-radius: 9px; border: 2px solid rgba(120,85,250,0.3); transition: border-color 0.3s; }
+        .qr-card:hover img { border-color: var(--purple); }
+        .qr-name { font-size: 0.95rem; font-weight: 700; color: white; }
+        .qr-sub { font-size: 0.66rem; color: var(--lilac); text-transform: uppercase; letter-spacing: 2px; }
+        .thanks-footer { font-size: 0.82rem; color: var(--muted); }
+
+        /* ── GLOBAL TOOLTIP ── */
+        #tip {
+            position: fixed; z-index: 9999; pointer-events: none;
+            background: rgba(19,19,19,0.96); border: 1px solid rgba(120,85,250,0.45);
+            color: #e0e0e6; font-size: 0.78rem; font-family: var(--sans);
+            padding: 8px 12px; border-radius: 8px; max-width: 300px; line-height: 1.45;
+            opacity: 0; transition: opacity 0.18s ease; backdrop-filter: blur(12px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5); white-space: normal;
+        }
+        #tip.vis { opacity: 1; }
+        #tip.has-link { pointer-events: auto; }
+        #tip .tip-src { display: block; margin-top: 6px; padding-top: 5px; border-top: 1px solid rgba(120,85,250,0.25); font-size: 0.65rem; }
+        #tip .tip-src a { color: var(--lilac); text-decoration: none; }
+        #tip .tip-src a:hover { color: var(--teal2); text-decoration: underline; }
+
+        /* ══════════════════════════════
+           Q&A PANEL
+        ══════════════════════════════ */
+        #qa-panel { position: fixed; top: 0; right: -380px; width: 360px; height: 100%; background: rgba(19,19,19,0.97); border-left: 1px solid rgba(120,85,250,0.22); z-index: 3000; transition: right 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        #qa-panel.open { right: 0; }
+        .qa-header { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(120,85,250,0.15); }
+        .qa-title { font-size: 0.85rem; font-weight: 700; color: var(--lilac); text-transform: uppercase; letter-spacing: 2px; }
+        .qa-close { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; }
+        .qa-close:hover { color: white; background: rgba(255,255,255,0.05); }
+        .qa-list { flex: 1; overflow-y: auto; padding: 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+        .qa-list::-webkit-scrollbar { width: 3px; }
+        .qa-list::-webkit-scrollbar-thumb { background: rgba(120,85,250,0.35); border-radius: 2px; }
+        .qa-item { padding: 14px 16px; background: rgba(120,85,250,0.07); border: 1px solid rgba(120,85,250,0.14); border-radius: 12px; animation: qaSlideIn 0.4s ease; }
+        @keyframes qaSlideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .qa-nome { font-size: 0.7rem; font-weight: 700; color: var(--teal2); margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+        .qa-del { background: none; border: none; cursor: pointer; font-size: 0.65rem; opacity: 0.3; transition: opacity 0.2s; padding: 2px 4px; line-height: 1; }
+        .qa-del:hover { opacity: 1; }
+        .qa-texto { font-size: 0.82rem; color: #d0d0d8; line-height: 1.45; }
+        .qa-votos { display: flex; align-items: center; gap: 5px; margin-top: 8px; font-size: 0.65rem; color: var(--purple); font-weight: 700; }
+        .qa-time { font-size: 0.55rem; color: #555; margin-top: 4px; }
+        .qa-empty { color: #555; font-size: 0.8rem; text-align: center; margin-top: 40px; }
+        .qa-qr { position: fixed; bottom: 80px; right: 16px; z-index: 2500; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; opacity: 0.65; transition: opacity 0.2s; }
+        .qa-qr:hover { opacity: 1; }
+        .qa-qr img { border-radius: 8px; border: 2px solid rgba(44,196,224,0.3); }
+        .qa-qr span { font-size: 0.55rem; color: var(--teal2); font-family: var(--sans); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .qa-badge { position: fixed; top: 16px; right: 16px; z-index: 2500; background: rgba(120,85,250,0.15); border: 1px solid rgba(120,85,250,0.35); color: var(--lilac); font-size: 0.65rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-family: var(--sans); text-transform: uppercase; letter-spacing: 1px; }
+        .qa-badge:hover { background: rgba(120,85,250,0.28); }
+        .qa-badge .qa-count { display: inline-block; background: var(--purple); color: white; font-size: 0.6rem; min-width: 18px; text-align: center; padding: 1px 5px; border-radius: 10px; margin-left: 6px; }
+
+        /* ══════════════════════════════
+           MOBILE
+        ══════════════════════════════ */
+        @media (max-width: 900px) {
+            body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
+            .slides-wrapper { position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+            .slide { padding: 56px 18px 90px; position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: auto; min-height: 100%; overflow-y: auto; overflow-x: hidden; justify-content: flex-start; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+            .slide.centered { justify-content: flex-start; }
+            .title { font-size: 2rem; letter-spacing: -1px; margin-bottom: 14px; }
+            .pair-head .title { font-size: 1.7rem; }
+            .pair-head { flex-wrap: wrap; gap: 8px; }
+            .label { font-size: 0.6rem; letter-spacing: 3px; }
+            .brand-corner { top: 14px; left: 14px; font-size: 0.6rem; }
+            .intro-title { font-size: 4.6rem !important; letter-spacing: -3px !important; }
+            .intro-title small { font-size: 1.3rem; }
+            .intro-sub { font-size: 0.85rem; }
+            .intro-eyebrow { font-size: 0.5rem; letter-spacing: 3px; }
+            .intro-badge { font-size: 0.7rem; padding: 8px 16px; margin-top: 28px; }
+            .two-col { grid-template-columns: 1fr !important; gap: 16px; }
+            .big-quote { font-size: 0.82rem; padding: 14px 16px; }
+            .stats-2x2 .n { font-size: 1.7rem; }
+            .thesis { font-size: 0.9rem; }
+            .staircase { gap: 4px; max-width: 100%; }
+            .stair { width: 100% !important; height: 34px; padding: 0 10px; margin-left: 0 !important; }
+            .stair-label { font-size: 0.72rem; }
+            .stair-badge { font-size: 0.5rem; padding: 2px 5px; }
+            .pair-grid { grid-template-columns: 1fr; gap: 12px; }
+            .lvl-card { grid-template-columns: 1fr; padding: 16px; }
+            .lvl-name { font-size: 1.1rem; }
+            .lvl-def { font-size: 0.82rem; }
+            .evo-grid { grid-template-columns: 1fr !important; gap: 12px; }
+            .evo-col { padding: 18px 16px; }
+            .evo-title { font-size: 1.2rem; }
+            .sdd-flow { flex-direction: column; gap: 6px; }
+            .sdd-arrow { display: none; }
+            #s9 .sdd-work { grid-template-columns: 1fr !important; gap: 12px; }
+            #t9-body { max-height: 200px; min-height: 160px; }
+            .doc-preview { min-height: 200px !important; }
+            .sdd-cols { grid-template-columns: 1fr; gap: 12px; }
+            .ladder-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .step-card { padding: 12px; }
+            .ladder-foot { flex-wrap: wrap; font-size: 0.75rem; }
+            .thanks-title { font-size: 3.8rem; letter-spacing: -3px; }
+            .qr-row { gap: 10px; flex-wrap: wrap; }
+            .qr-card { padding: 12px; }
+            .qr-card img { width: 80px !important; height: 80px !important; }
+            .qr-name { font-size: 0.72rem; } .qr-sub { font-size: 0.52rem; }
+            .nav-pill { padding: 6px 12px; gap: 8px; bottom: 10px; z-index: 2000; }
+            .nav-btn { font-size: 0.7rem; padding: 3px 8px; }
+            .nav-dot { width: 5px; height: 5px; }
+            #tip { max-width: 220px; font-size: 0.68rem; }
+            #qa-panel { width: 100%; right: -100%; }
+            .qa-badge { top: 12px; right: 12px; font-size: 0.58rem; padding: 5px 10px; }
+            .qa-qr { bottom: 52px; right: auto; left: 10px; }
+            .qa-qr img { width: 36px !important; height: 36px !important; }
+            .qa-qr span { font-size: 0.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-line" id="progressLine"></div>
+    <div class="brand-corner"><span class="x">N</span><span>Nutanix · Engenharia Agêntica</span></div>
+
+    <div class="slides-wrapper">
+
+        <!-- ① INTRO -->
+        <div class="slide centered" id="s1">
+            <canvas id="particles"></canvas>
+            <div class="intro-wrap">
+                <div class="intro-eyebrow">Nutanix · Tech Talk · 2026</div>
+                <div class="intro-title">8 Níveis<small>de maturidade em Engenharia Agêntica</small></div>
+                <div class="intro-sub">De <em>Tab Complete</em> a <em>Autonomous Agent Teams</em> — e onde o Spec-Driven Development entra nessa escada</div>
+                <div class="intro-badge">Onde o seu time está hoje? Onde deveria estar em 12 meses?</div>
+            </div>
+        </div>
+
+        <!-- ② O MODELO NÃO É O SEGREDO -->
+        <div class="slide alt" id="s2">
+            <div class="two-col">
+                <div>
+                    <div class="label">Ponto de partida</div>
+                    <h2 class="title">O modelo não é <span class="grad">o segredo.</span></h2>
+                    <div class="big-quote warn">
+                        "I just see things, say things, run things, and copy-paste things, and it mostly works."
+                        <div class="qauthor">— Andrej Karpathy, ao cunhar "vibe coding" · fev/2025</div>
+                    </div>
+                    <div class="big-quote">
+                        "Um time pequeno entregou um produto com cerca de um milhão de linhas de código sem uma linha escrita à mão. O modelo era impressionante — mas o modelo não era o segredo. O segredo era o <em>harness</em>: a engenharia ao redor do modelo."
+                        <div class="qauthor">— OpenAI, <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noopener" style="color:inherit">"Harness engineering"</a> · fev/2026 (paráfrase)</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="stats-2x2" id="s2-stats">
+                        <div class="stat-box" data-tip="Stack Overflow Developer Survey 2025: 84% dos devs usam ou planejam usar ferramentas de IA no fluxo de trabalho; 51% dos profissionais usam diariamente." data-src="https://survey.stackoverflow.co/2025/" data-src-name="Stack Overflow Survey 2025"><div class="n">84%</div><div class="l">dos devs usam ou vão usar IA no fluxo de trabalho</div></div>
+                        <div class="stat-box" data-tip="Na mesma pesquisa, 46% dizem desconfiar da precisão das respostas da IA; só 33% confiam. Confiança caiu em relação a 2024." data-src="https://survey.stackoverflow.co/2025/ai" data-src-name="Stack Overflow Survey 2025"><div class="n">46%</div><div class="l">desconfiam da precisão do que a IA gera</div></div>
+                        <div class="stat-box" data-tip="Estudo controlado da METR (jul/2025) com devs experientes em repositórios que conhecem bem: com IA ficaram 19% MAIS LENTOS — mas acreditavam ter ficado 20% mais rápidos." data-src="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" data-src-name="METR · jul/2025"><div class="n">−19%</div><div class="l">mais lentos: devs experientes com IA em repos que dominam (METR)</div></div>
+                        <div class="stat-box" data-tip="Gartner (Predicts 2026): abordagens prompt-to-app sem engenharia ao redor podem gerar +2.500% de defeitos em software até 2028." data-src="https://www.armorcode.com/report/gartner-predicts-2026-ai-potential-and-risks-emerge-in-software-engineering-technologies" data-src-name="Gartner Predicts 2026"><div class="n">+2500%</div><div class="l">defeitos previstos via prompt-to-app até 2028</div></div>
+                    </div>
+                    <div class="thesis">Todo mundo tem acesso ao mesmo modelo. A diferença entre <strong>demo</strong> e <strong>produção</strong> é a engenharia ao redor dele — e ela evolui em níveis.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ③ A ESCADA -->
+        <div class="slide centered" id="s3">
+            <div style="width:100%;max-width:960px;margin:0 auto">
+                <div class="label" style="text-align:center">O mapa</div>
+                <h2 class="title" style="text-align:center;font-size:2.9rem;margin-bottom:0">Os 8 Níveis de <span class="grad">Engenharia Agêntica</span></h2>
+                <p style="text-align:center;font-size:0.82rem;color:var(--muted);margin-top:6px">Passe o mouse em cada degrau</p>
+                <div class="staircase">
+                    <div class="stair stair-8"><span class="stair-num">8</span><span class="stair-label">Autonomous Agent Teams</span><span class="stair-badge badge-front">fronteira</span></div>
+                    <div class="stair stair-7"><span class="stair-num">7</span><span class="stair-label">Background Agents</span><span class="stair-badge badge-front">produção em 2026</span></div>
+                    <div class="stair stair-6"><span class="stair-num">6</span><span class="stair-label">Harness Engineering</span></div>
+                    <div class="stair stair-5"><span class="stair-num">5</span><span class="stair-label">MCP &amp; Skills</span></div>
+                    <div class="stair stair-4"><span class="stair-num">4</span><span class="stair-label">Compounding Engineering</span><span class="stair-badge badge-sdd">SDD compõe aqui</span></div>
+                    <div class="stair stair-3"><span class="stair-num">3</span><span class="stair-label">Context Engineering</span><span class="stair-badge badge-sdd">SDD começa aqui</span></div>
+                    <div class="stair stair-2"><span class="stair-num">2</span><span class="stair-label">Agent IDE</span><span class="stair-badge badge-base">← a maioria está aqui</span></div>
+                    <div class="stair stair-1"><span class="stair-num">1</span><span class="stair-label">Tab Complete</span><span class="stair-badge badge-base">← a maioria começa aqui</span></div>
+                </div>
+                <div class="zones">
+                    <span class="zone"><i style="background:rgba(140,140,160,0.6)"></i>1–2 · Assistido</span>
+                    <span class="zone"><i style="background:var(--purple)"></i>3–4 · Estruturado</span>
+                    <span class="zone"><i style="background:var(--deep)"></i>5–6 · Instrumentado</span>
+                    <span class="zone"><i style="background:var(--teal2)"></i>7–8 · Autônomo</span>
+                </div>
+                <div class="levels-footer" id="levels-credit">Escada: <a href="https://www.bassimeledath.com/blog/levels-of-agentic-engineering" target="_blank" rel="noopener">"The 8 Levels of Agentic Engineering" — Bassim Eledath, mar/2026</a> · zonas e posição do SDD são leitura desta palestra</div>
+            </div>
+        </div>
+
+        <!-- ④ NÍVEIS 1–2 -->
+        <div class="slide alt" id="s4">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Zona 1 · Assistido</div>
+                <div class="pair-head"><h2 class="title">Níveis <span class="grad">1 e 2</span></h2><span class="pair-zone" style="background:rgba(140,140,160,0.12);color:#b0b0bc">a IA acelera, você decide tudo</span></div>
+                <div class="pair-grid">
+                    <div class="lvl-card" style="--accent:#a0a0b0">
+                        <div class="lvl-top"><span class="lvl-n">1</span><span class="lvl-name">Tab Complete</span><span class="lvl-tag">2021 →</span></div>
+                        <div class="lvl-def">Autocomplete que sugere a próxima linha ou bloco. Você continua fazendo 100% das decisões; a IA só encurta a digitação.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Aceita sugestões inline, nunca "conversa" com a IA</li><li>Ganho real em boilerplate e código repetitivo</li><li>Zero mudança no processo do time</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas típicas</div><div class="chips"><span class="chip">GitHub Copilot (inline)</span><span class="chip">Cursor Tab</span><span class="chip">Windsurf / Codeium</span><span class="chip">JetBrains AI</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> dar ao agente permissão para ler o repositório, editar vários arquivos e rodar comandos.</div>
+                    </div>
+                    <div class="lvl-card" style="--accent:#b8b0e0">
+                        <div class="lvl-top"><span class="lvl-n">2</span><span class="lvl-name">Agent IDE</span><span class="lvl-tag">2024 →</span></div>
+                        <div class="lvl-def">Um agente lê o repo, edita múltiplos arquivos, roda testes e comandos — no IDE ou no terminal. É aqui que o <em>vibe coding</em> acontece: rápido para protótipos, frágil em produção.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Pede features em linguagem natural e aceita diffs sem ler</li><li>Repete o mesmo contexto a cada prompt novo</li><li>Resultado varia muito de dev para dev</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas típicas</div><div class="chips"><span class="chip">Cursor</span><span class="chip">Claude Code</span><span class="chip">Codex CLI</span><span class="chip">Copilot agent mode</span><span class="chip">Gemini CLI</span><span class="chip">Windsurf</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> parar de repetir contexto — escrever, uma vez e versionado, o que o agente precisa saber.</div>
+                    </div>
+                </div>
+                <div class="pair-note"><span class="ic">⚠️</span><span>O ganho aparece no <b>protótipo</b>; o custo aparece no <b>segundo mês</b>: código que ninguém entende, testes ausentes, contexto perdido a cada sessão.</span></div>
+                <div class="pair-note" data-tip="Octoverse 2025: '80% of new developers on GitHub use Copilot in their first week'. E 84% dos devs usam ou planejam usar IA (Stack Overflow 2025)." data-src="https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/" data-src-name="GitHub Octoverse 2025" style="cursor:pointer"><span class="ic">📊</span><span><b>80%</b> dos novos devs no GitHub usam Copilot já na primeira semana (Octoverse 2025) — os níveis 1–2 viraram commodity.</span></div>
+            </div>
+        </div>
+
+        <!-- ⑤ NÍVEIS 3–4 -->
+        <div class="slide" id="s5">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Zona 2 · Estruturado</div>
+                <div class="pair-head"><h2 class="title">Níveis <span class="grad">3 e 4</span></h2><span class="pair-zone" style="background:rgba(120,85,250,0.14);color:var(--lilac)">o repositório vira o cérebro do agente</span></div>
+                <div class="pair-grid">
+                    <div class="lvl-card" style="--accent:var(--purple)">
+                        <div class="lvl-top"><span class="lvl-n">3</span><span class="lvl-name">Context Engineering</span><span class="lvl-tag">2025 →</span></div>
+                        <div class="lvl-def">Projetar deliberadamente o que entra na janela de contexto — regras, arquitetura, convenções, exemplos — e o que fica de fora. O prompt deixa de ser improviso e vira artefato do repo. Lema do autor: <em>"every token needs to fight for its place in the prompt"</em>.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li><code>AGENTS.md</code> / <code>CLAUDE.md</code> / rules versionados e revisados em PR</li><li>Docs curados para o agente, não só para humanos</li><li>Onboarding de um agente novo leva minutos, não dias</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas e padrões</div><div class="chips"><span class="chip">AGENTS.md (padrão aberto)</span><span class="chip">CLAUDE.md</span><span class="chip">Cursor Rules</span><span class="chip">copilot-instructions.md</span><span class="chip">llms.txt</span><span class="chip">spec.md</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> fazer cada tarefa deixar o repositório mais fácil para a próxima — contexto que se acumula em vez de evaporar.</div>
+                    </div>
+                    <div class="lvl-card" style="--accent:var(--lilac)">
+                        <div class="lvl-top"><span class="lvl-n">4</span><span class="lvl-name">Compounding Engineering</span><span class="lvl-tag">2025 →</span></div>
+                        <div class="lvl-def">Loop <em>Plan → Work → Review → Codify</em>: cada tarefa termina codificando a lição (spec, teste, regra, ADR) em arquivos que toda sessão futura lê. Pular o "codify" é só engenharia tradicional com IA — o ganho composto vem daí.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Specs versionadas antes do código; testes como contrato</li><li>Erros de review viram regra escrita, não conversa perdida</li><li>Velocidade sobe com o tempo em vez de cair</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas e padrões</div><div class="chips"><span class="chip">Spec Kit (GitHub)</span><span class="chip">Kiro specs (AWS)</span><span class="chip">ADRs</span><span class="chip">memória de projeto</span><span class="chip">Compounding Engineering (Every)</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> conectar o agente ao mundo fora do repo — sistemas, dados e ferramentas da empresa.</div>
+                    </div>
+                </div>
+                <div class="pair-note"><span class="ic">📐</span><span><b>Spec-Driven Development mora aqui.</b> A spec é contexto explícito (nível 3) que se acumula e compõe (nível 4). É a ponte entre "vibe" e engenharia.</span></div>
+            </div>
+        </div>
+
+        <!-- ⑥ NÍVEIS 5–6 -->
+        <div class="slide alt" id="s6">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Zona 3 · Instrumentado</div>
+                <div class="pair-head"><h2 class="title">Níveis <span class="grad">5 e 6</span></h2><span class="pair-zone" style="background:rgba(75,0,170,0.3);color:var(--lilac)">o agente vira sistema — com controles</span></div>
+                <div class="pair-grid">
+                    <div class="lvl-card" style="--accent:var(--purple)">
+                        <div class="lvl-top"><span class="lvl-n">5</span><span class="lvl-name">MCP &amp; Skills</span><span class="lvl-tag">nov/2024 →</span></div>
+                        <div class="lvl-def">O agente ganha ferramentas padronizadas (<em>Model Context Protocol</em>) e procedimentos reutilizáveis (<em>Skills</em>): acessa Jira, bancos, observabilidade, deploy — em vez de adivinhar.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Servidores MCP internos para os sistemas da empresa</li><li>Skills versionadas por time (deploy, review, runbooks)</li><li>O agente consulta a fonte de verdade, não a memória do modelo</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas e padrões</div><div class="chips"><span class="chip">MCP (Anthropic → Linux Foundation)</span><span class="chip">Agent Skills</span><span class="chip">MCP Registry</span><span class="chip">MCP servers internos</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> tratar o agente como software em produção — com permissões, medição e limites.</div>
+                    </div>
+                    <div class="lvl-card" style="--accent:var(--lilac)">
+                        <div class="lvl-top"><span class="lvl-n">6</span><span class="lvl-name">Harness Engineering</span><span class="lvl-tag">2026 →</span></div>
+                        <div class="lvl-def">A engenharia ao redor do modelo: permissões, sandboxes, guardrails, <em>evals</em>, observabilidade, custo e loops de feedback mecânicos (lint, testes, CI). <em>"Give the agent the feedback loop, not just the editor."</em> Não é prompt engineering com outro nome.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Evals antes de trocar modelo ou prompt</li><li>Métricas: custo por tarefa, taxa de PR aceito, retrabalho</li><li>Hooks que bloqueiam ações perigosas; ambientes isolados</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas e padrões</div><div class="chips"><span class="chip">hooks &amp; permissões</span><span class="chip">sandboxes</span><span class="chip">evals (Promptfoo, Braintrust, LangSmith)</span><span class="chip">OpenTelemetry</span><span class="chip">circuit breakers</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> soltar o agente sem você olhando — porque o harness olha por você.</div>
+                    </div>
+                </div>
+                <div class="pair-note"><span class="ic">🧰</span><span>Nível 6 é onde a maioria das empresas <b>trava</b>: exige disciplina de plataforma, não só ferramenta nova.</span></div>
+                <div class="pair-note" data-tip="OpenAI, relatório 'The Next Era of Knowledge Work' (02/06/2026): Codex passou de 5 milhões de usuários semanais ativos. Stacklok, 'State of MCP in Software 2026': 41% das orgs de software já têm MCP em produção limitada ou ampla." data-src="https://www.constellationr.com/insights/news/openai-touts-broadening-codex-usage-5-million-weekly-active-users" data-src-name="Constellation Research · OpenAI" style="cursor:pointer"><span class="ic">📊</span><span><b>5 milhões</b> de usuários semanais no Codex (jun/2026) e <b>41%</b> das orgs de software com MCP em produção (Stacklok 2026): harness virou infraestrutura.</span></div>
+            </div>
+        </div>
+
+        <!-- ⑦ NÍVEIS 7–8 -->
+        <div class="slide" id="s7">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Zona 4 · Autônomo</div>
+                <div class="pair-head"><h2 class="title">Níveis <span class="grad-teal">7 e 8</span></h2><span class="pair-zone" style="background:rgba(0,146,176,0.18);color:var(--teal2)">humano por exceção, não por linha</span></div>
+                <div class="pair-grid">
+                    <div class="lvl-card" style="--accent:var(--teal2)">
+                        <div class="lvl-top"><span class="lvl-n">7</span><span class="lvl-name">Background Agents</span><span class="lvl-tag">2025 →</span></div>
+                        <div class="lvl-def">Agentes exploram, planejam e implementam de forma assíncrona, sem aprovação prévia do plano, enquanto o time faz outra coisa. Um orquestrador central roteia trabalho para vários agentes e modelos em paralelo. Precisam de spec clara e harness para funcionar.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Issue → PR sem ninguém abrir o IDE</li><li>Agentes disparados por eventos (CI falhou, alerta, cron)</li><li>Vários agentes em paralelo, cada um no seu ambiente</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas típicas</div><div class="chips"><span class="chip">Codex (cloud)</span><span class="chip">Copilot coding agent</span><span class="chip">Google Jules</span><span class="chip">Devin</span><span class="chip">Claude Code (web / cloud)</span><span class="chip">Cursor background agents</span></div></div>
+                        <div class="lvl-unlock"><b>Destrava o próximo:</b> o orquestrador central vira gargalo — os agentes precisam coordenar-se diretamente entre si.</div>
+                    </div>
+                    <div class="lvl-card" style="--accent:var(--teal2)">
+                        <div class="lvl-top"><span class="lvl-n">8</span><span class="lvl-name">Autonomous Agent Teams</span><span class="lvl-tag">fronteira</span></div>
+                        <div class="lvl-def">Agentes coordenam-se diretamente entre si — reivindicam tarefas, compartilham descobertas, sinalizam dependências e resolvem conflitos — sem passar tudo por um orquestrador central. O humano aprova marcos e decide escopo, não linhas.</div>
+                        <div><div class="lvl-h">Sinais de que você está aqui</div><ul class="lvl-list"><li>Dezenas de agentes simultâneos na mesma base de código</li><li>O gargalo é conflito e coordenação, não "um orquestrador"</li><li>Governança: quem responde pelo que foi entregue?</li></ul></div>
+                        <div><div class="lvl-h">Ferramentas típicas</div><div class="chips"><span class="chip">Claude Code Agent Teams (preview · fev/2026)</span><span class="chip">Claude Agent SDK</span><span class="chip">Devin Desktop (multi-agente via ACP)</span><span class="chip">AutoGen · CrewAI</span></div></div>
+                        <div class="lvl-unlock"><b>O que falta:</b> o próprio autor não define um nível 9. Modelos ainda lentos e caros para isso; o gargalo é confiança, governança e custo — multiagente consome ~15× os tokens de um chat.</div>
+                    </div>
+                </div>
+                <div class="pair-note"><span class="ic">🚀</span><span>Poucas empresas operam no 8 fora de produtos de IA. Mas o nível 7 já é <b>rotina em 2026</b> para quem construiu os níveis 3–6 antes.</span></div>
+                <div class="pair-note" data-tip="GitHub Octoverse 2025: '1+ million pull requests' criados pelo Copilot coding agent entre maio e setembro de 2025. Anthropic Engineering: sistema multiagente (Opus 4 líder + subagentes Sonnet 4) superou o agente único em 90,2% no benchmark interno de pesquisa — consumindo ~15× os tokens de um chat." data-src="https://www.anthropic.com/engineering/multi-agent-research-system" data-src-name="Anthropic Engineering · GitHub Octoverse 2025" style="cursor:pointer"><span class="ic">📊</span><span><b>1M+</b> PRs abertos pelo Copilot coding agent em 5 meses (Octoverse 2025). Multiagente: <b>+90%</b> de desempenho a <b>~15×</b> o custo em tokens (Anthropic).</span></div>
+            </div>
+        </div>
+
+        <!-- ⑧ EVOLUÇÃO — ANTES / VIBE / SDD -->
+        <div class="slide alt" id="s8">
+            <div style="width:100%;max-width:1180px;margin:0 auto">
+                <div class="label">A evolução do ciclo de desenvolvimento</div>
+                <h2 class="title" style="font-size:2.7rem;margin-bottom:16px">Antes. <span style="color:var(--warn)">Vibe Coding.</span> <span class="grad">Spec-Driven.</span></h2>
+                <div class="evo-grid">
+                    <div class="evo-col evo-old">
+                        <div class="evo-era">Antes</div>
+                        <div class="evo-title">Tradicional</div>
+                        <div class="evo-stats">
+                            <div class="evo-stat" data-tip="Projeto pequeno 2-4 meses, médio 4-8, grande/complexo 12-24+; por setor: saúde 12-18, fintech 9-15" data-src="https://scaleupally.io/blog/software-development-timeline/" data-src-name="ScaleUpAlly"><span class="evo-val">2-24m</span><span class="evo-lbl">ciclo de entrega, conforme o porte</span></div>
+                            <div class="evo-stat" data-tip="Projetos pequenos/médios: 5-7 pessoas (7 é o 'número ideal'); grandes: 8-15+. PM, devs, QA, designer, tech lead" data-src="https://onix-systems.com/blog/software-development-team-size-and-roles" data-src-name="Onix Systems"><span class="evo-val">5-7</span><span class="evo-lbl">pessoas por time (PM, QA, Dev, UX, Tech Lead)</span></div>
+                            <div class="evo-stat" data-tip="31% bem-sucedidos, 50% atrasam/estouram budget, 19% falham completamente" data-src="https://cdn1-public.infotech.com/agile/CHAOSReport2015-Final.pdf" data-src-name="Standish Group CHAOS Report 2015"><span class="evo-val">31%</span><span class="evo-lbl">taxa de sucesso de projetos</span></div>
+                            <div class="evo-stat" data-tip="Média geral: 32% do tempo codificando; 39% para 'software developers' puros. O resto é reunião, troca de contexto, espera" data-src="https://www.sonarsource.com/blog/how-much-time-do-developers-spend-actually-writing-code/" data-src-name="Sonar"><span class="evo-val">32%</span><span class="evo-lbl">do tempo efetivamente codificando</span></div>
+                            <div class="evo-stat" data-tip="CHAOS Report: 31% dos projetos bem-sucedidos, 50% 'desafiados' (atraso ou estouro de budget), 19% falham completamente" data-src="https://cdn1-public.infotech.com/agile/CHAOSReport2015-Final.pdf" data-src-name="Standish Group CHAOS Report 2015"><span class="evo-val">19%</span><span class="evo-lbl">dos projetos falham completamente</span></div>
+                            <div class="evo-stat" data-tip="44% das organizações reportam onboarding > 2 meses. Primeiro PR: ~1 semana" data-src="https://about.gitlab.com/the-source/platform/how-to-accelerate-developer-onboarding-and-why-it-matters/" data-src-name="GitLab"><span class="evo-val">2 meses</span><span class="evo-lbl">onboarding de novo dev</span></div>
+                        </div>
+                        <div class="evo-src">Clique nos dados para ver a fonte</div>
+                    </div>
+                    <div class="evo-col evo-vibe">
+                        <div class="evo-era">2024–25 · níveis 1–2</div>
+                        <div class="evo-title">Vibe Coding</div>
+                        <div class="evo-stats">
+                            <div class="evo-stat" data-tip="Karpathy: 'Accept All always, don't read the diffs anymore… I just see stuff, say stuff, run stuff'" data-src="https://simonwillison.net/2025/Feb/6/andrej-karpathy/" data-src-name="Karpathy (via Simon Willison)"><span class="evo-val">horas</span><span class="evo-lbl">para protótipo (parece rápido)</span></div>
+                            <div class="evo-stat" data-tip="'Not too bad for throwaway weekend projects' — o próprio Karpathy ressalvou que não é para produção" data-src="https://en.wikipedia.org/wiki/Vibe_coding" data-src-name="Wikipedia"><span class="evo-val">1</span><span class="evo-lbl">dev + "aceitar tudo" da IA</span></div>
+                            <div class="evo-stat" data-tip="Análise de relatos de praticantes na web (arXiv 2510.00328): 68% descrevem o resultado como 'rápido mas falho' e 19% como 'frágil'. É percepção, não medição de código" data-src="https://arxiv.org/html/2510.00328v1" data-src-name="arXiv 2510.00328"><span class="evo-val">87%</span><span class="evo-lbl">dos relatos: 'rápido mas falho' ou 'frágil'</span></div>
+                            <div class="evo-stat" data-tip="Estudo com 132 unidades comportamentais. 36% pularam QA completamente, 18% confiaram sem verificar" data-src="https://arxiv.org/html/2510.00328v1" data-src-name="arXiv 2510.00328"><span class="evo-val">11%</span><span class="evo-lbl">taxa de colapso/abandono</span></div>
+                            <div class="evo-stat" data-tip="Blog da Glide: um usuário acumulou US$ 350 em um único dia de vibe coding — o custo de token explode quando o agente itera sem plano" data-src="https://www.glideapps.com/blog/vibe-coding-cost" data-src-name="Glide Blog"><span class="evo-val">$350</span><span class="evo-lbl">gastos em 1 dia por um único usuário (caso real)</span></div>
+                            <div class="evo-stat" data-tip="Gartner prevê aumento de 2.500% nos defeitos de software via abordagens prompt-to-app até 2028" data-src="https://www.armorcode.com/report/gartner-predicts-2026-ai-potential-and-risks-emerge-in-software-engineering-technologies" data-src-name="Gartner Predicts 2026"><span class="evo-val">+2500%</span><span class="evo-lbl">defeitos previstos até 2028 (Gartner)</span></div>
+                        </div>
+                        <div class="evo-src">Clique nos dados para ver a fonte</div>
+                    </div>
+                    <div class="evo-col evo-sdd">
+                        <div class="evo-era">Agora · níveis 3–4 →</div>
+                        <div class="evo-title">Spec-Driven <span class="grad">Development</span></div>
+                        <div class="evo-stats">
+                            <div class="evo-stat" data-tip="Wipro, no lançamento do AI-DLC (AWS DevSphere 2025, Bengaluru): 'four production-ready modules within just 20 hours' usando a metodologia e o Amazon Q Developer" data-src="https://www.aboutamazon.in/news/aws/aws-launches-new-ai-methodology-devsphere" data-src-name="About Amazon · AWS DevSphere 2025"><span class="evo-val">20h</span><span class="evo-lbl">para 4 módulos prontos para produção (Wipro, AI-DLC)</span></div>
+                            <div class="evo-stat" data-tip="Piloto AI-DLC numa instituição financeira europeia: de 1 PO + 12 devs entregando 15 features/sprint para 1 PO + 3 devs entregando 35 features/sprint" data-src="https://aws.amazon.com/blogs/industries/ai-driven-development-lifecycle-for-financial-services/" data-src-name="AWS Blog · Financial Services"><span class="evo-val">35 vs 15</span><span class="evo-lbl">features/sprint com 1/4 do time (piloto AI-DLC)</span></div>
+                            <div class="evo-stat" data-tip="Carta de Andy Jassy aos acionistas (2025): o motor de inferência 'Mantle' do Amazon Bedrock foi construído por 6 engenheiros em 76 dias, contra estimativa de ~40 pessoas por ~1 ano, usando o Kiro" data-src="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" data-src-name="Amazon · carta aos acionistas 2025"><span class="evo-val">6 eng</span><span class="evo-lbl">em 76 dias, onde se estimava 40 por 1 ano (Bedrock + Kiro)</span></div>
+                            <div class="evo-stat" data-tip="Spec Kit (GitHub, set/2025): a spec é executável e é a fonte de verdade — specify → plan → tasks → implement. 133 mil estrelas em 12 meses (GitHub API, 03/09/2026)" data-src="https://github.com/github/spec-kit" data-src-name="GitHub Spec Kit"><span class="evo-val">133k ★</span><span class="evo-lbl">Spec Kit em 12 meses — SDD virou padrão de mercado</span></div>
+                            <div class="evo-stat" data-tip="'Think 95% or higher accuracy in implementing specs on the first go' — META declarada pelo autor da Red Hat, não medição. Vale como régua, não como resultado" data-src="https://developers.redhat.com/articles/2025/10/22/how-spec-driven-development-improves-ai-coding-quality" data-src-name="Red Hat Developer"><span class="evo-val">95%+</span><span class="evo-lbl">acerto na 1ª tentativa — a meta do spec-driven (Red Hat)</span></div>
+                            <div class="evo-stat" data-tip="McKinsey: com IA generativa, devs codificam 35-45% mais rápido, refatoram 20-30% mais rápido e documentam na metade do tempo — ganhos por tarefa, não 10×" data-src="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/unleashing-developer-productivity-with-generative-ai" data-src-name="McKinsey"><span class="evo-val">35-45%</span><span class="evo-lbl">mais rápido para codificar com IA (McKinsey)</span></div>
+                        </div>
+                        <div class="evo-src">Clique nos dados para ver a fonte</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑨ SDD EM AÇÃO -->
+        <div class="slide" id="s9">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Spec-Driven Development</div>
+                <h2 class="title" style="font-size:2.6rem;margin-bottom:10px">A spec é o <span class="grad">código-fonte.</span> O código é o build.</h2>
+                <div class="sdd-flow" id="sdd-flow">
+                    <div class="sdd-step" data-stage="0"><div class="k">0</div><div class="nm">Constitution</div><div class="ar">constitution.md · princípios inegociáveis</div></div><span class="sdd-arrow">→</span>
+                    <div class="sdd-step" data-stage="1"><div class="k">1</div><div class="nm">Specify</div><div class="ar">spec.md · o quê e por quê</div></div><span class="sdd-arrow">→</span>
+                    <div class="sdd-step" data-stage="2"><div class="k">2</div><div class="nm">Clarify</div><div class="ar">perguntas antes de decidir</div></div><span class="sdd-arrow">→</span>
+                    <div class="sdd-step" data-stage="3"><div class="k">3</div><div class="nm">Plan</div><div class="ar">plan.md · como (stack, contratos)</div></div><span class="sdd-arrow">→</span>
+                    <div class="sdd-step" data-stage="4"><div class="k">4</div><div class="nm">Tasks</div><div class="ar">tasks.md · unidades paralelizáveis</div></div><span class="sdd-arrow">→</span>
+                    <div class="sdd-step" data-stage="5"><div class="k">5</div><div class="nm">Implement</div><div class="ar">código + testes + PR</div></div>
+                </div>
+                <div class="sdd-work" style="display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch">
+                    <div class="terminal">
+                        <div class="t-bar"><div class="td r"></div><div class="td y"></div><div class="td g"></div><div class="t-ttl">portal-autoatendimento — Spec Kit + Claude Code</div></div>
+                        <div id="t9-body"></div>
+                    </div>
+                    <div class="doc-preview">
+                        <div class="doc-tab"><span>📄</span><span id="doc-filename">aguardando...</span></div>
+                        <div class="doc-body" id="doc-body"><span style="color:#5f5f6a">O artefato gerado aparece aqui...</span></div>
+                    </div>
+                </div>
+                <div class="sdd-tools">
+                    <span class="lbl">Ferramentas</span>
+                    <a class="tool" href="https://github.com/github/spec-kit" target="_blank" rel="noopener" data-tip="GitHub, set/2025 (repo em ago/2025; post de Den Delimarsky que batizou o termo). CLI specify + comandos /speckit.*: constitution → specify → clarify → plan → tasks → implement. 133k ★"><b>Spec Kit</b> · GitHub · set/25</a>
+                    <a class="tool" href="https://kiro.dev/blog/general-availability/" target="_blank" rel="noopener" data-tip="AWS. Preview em jul/2025, GA em 17/11/2025. Fluxo requirements (formato EARS) → design → tasks, com testes baseados em propriedades"><b>Kiro</b> · AWS · jul/25</a>
+                    <a class="tool" href="https://tessl.io/blog/tessl-launches-spec-driven-framework-and-registry" target="_blank" rel="noopener" data-tip="Set/2025, Guy Podjarny (ex-Snyk). Specs como memória de longo prazo versionada no código + Spec Registry com 10.000+ specs de bibliotecas open source"><b>Tessl</b> · set/25</a>
+                    <a class="tool" href="https://github.com/Fission-AI/OpenSpec" target="_blank" rel="noopener" data-tip="Fission-AI, ago/2025. Leve: /opsx:propose → apply → archive; separa specs/ (estado atual) de changes/ (propostas). 67k ★"><b>OpenSpec</b> · ago/25</a>
+                    <a class="tool" href="https://github.com/awslabs/aidlc-workflows" target="_blank" rel="noopener" data-tip="AWS, ago/2025; workflows abertos em nov/2025 (awslabs/aidlc-workflows). Inception → Construction → Operations, com rituais de 'Mob Elaboration' e 'Mob Construction'"><b>AI-DLC</b> · AWS · ago/25</a>
+                    <a class="tool" href="https://www.thoughtworks.com/radar/techniques/spec-driven-development" target="_blank" rel="noopener" data-tip="Thoughtworks Technology Radar vol. 34 (nov/2025): 'Spec-driven development' entra no anel Assess — 'os workflows permanecem elaborados e opinativos'"><b>Radar</b> · Thoughtworks · Assess · nov/25</a>
+                    <span class="kbd-hint">↓ avança · ↑ volta · R retoma</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑩ SDD — GANHOS, LIMITES, ENCAIXE -->
+        <div class="slide alt" id="s10">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Spec-Driven Development</div>
+                <h2 class="title" style="font-size:2.6rem;margin-bottom:18px">O que ganha, onde dói, <span class="grad">onde encaixa.</span></h2>
+                <div class="sdd-cols">
+                    <div class="col-card win">
+                        <h3>O que ganha</h3>
+                        <ul class="win-list" id="sdd-wins">
+                            <li data-tip="A spec vira contrato: o agente implementa contra critérios de aceite escritos, não contra a memória do prompt anterior."><span class="v">contrato</span><span>Critérios de aceite antes do código — a IA não "adivinha" o escopo</span></li>
+                            <li data-tip="Sem spec, cada prompt recomeça do zero. Com spec versionada, o contexto sobrevive à sessão, ao dev e ao modelo."><span class="v">memória</span><span>Contexto sobrevive à sessão, ao dev e à troca de modelo</span></li>
+                            <li data-tip="tasks.md marca tarefas [P] paralelizáveis: pré-requisito para background agents (nível 7) trabalharem em paralelo com segurança."><span class="v">paralelo</span><span>Tarefas independentes → vários agentes ao mesmo tempo</span></li>
+                            <li data-tip="Piloto AI-DLC em instituição financeira europeia: 1 PO + 3 devs passaram a entregar 35 features/sprint, contra 15 features com 1 PO + 12 devs antes" data-src="https://aws.amazon.com/blogs/industries/ai-driven-development-lifecycle-for-financial-services/" data-src-name="AWS Blog · Financial Services"><span class="v">35 / 15</span><span>features por sprint com 1/4 do time (piloto AI-DLC)</span></li>
+                            <li data-tip="Carta de Andy Jassy aos acionistas (2025): motor de inferência do Bedrock construído por 6 engenheiros em 76 dias com o Kiro, contra estimativa de ~40 pessoas por ~1 ano" data-src="https://www.aboutamazon.com/news/company-news/amazon-ceo-andy-jassy-2025-letter-to-shareholders" data-src-name="Amazon · carta aos acionistas 2025"><span class="v">6 eng</span><span>em 76 dias, onde se estimava 40 por 1 ano (Bedrock + Kiro)</span></li>
+                            <li data-tip="A spec é revisável por PM, QA e segurança antes de existir código — o review sobe de nível de abstração."><span class="v">review</span><span>Revisão desloca-se de linhas de código para intenção e risco</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-card pain">
+                        <h3>Onde dói</h3>
+                        <ul class="pain-list" id="sdd-pains">
+                            <li data-tip="Para um bug de 3 linhas, spec + plan + tasks é burocracia. SDD escala com a complexidade — use o modo leve para mudanças pequenas."><span class="v">▲</span><span><b>Overhead</b> em mudanças pequenas — spec de 4 páginas para um bug de 3 linhas</span></li>
+                            <li data-tip="Spec drift: o código muda, a spec não. Sem CI que valide spec × código, ela vira documento morto em semanas."><span class="v">▲</span><span><b>Spec drift</b>: sem validação contínua, a spec vira documento morto</span></li>
+                            <li data-tip="Se o time não sabe escrever requisitos claros, a IA amplifica a ambiguidade. Spec ruim = código ruim mais rápido."><span class="v">▲</span><span><b>Garbage in</b>: spec ambígua gera código errado com mais convicção</span></li>
+                            <li data-tip="Colin Eberhardt (Scott Logic, nov/2025): 'Spec Kit drags you right back into the past!' — design upfront e fluxo sequencial rígido. Antídoto: spec pequena, incremental, por feature" data-src="https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html" data-src-name="Scott Logic"><span class="v">▲</span><span><b>Waterfall disfarçado</b> se a spec tenta prever tudo de uma vez (Scott Logic)</span></li>
+                            <li data-tip="Mesmo teste do Scott Logic: Spec Kit gastou 33m30 de agente + 3,5h de revisão para 689 linhas; o fluxo direto do autor fez tarefa equivalente em ~32 min (8 min de agente + 15 de revisão + 9 de teste)" data-src="https://blog.scottlogic.com/2025/11/26/putting-spec-kit-through-its-paces-radical-idea-or-reinvented-waterfall.html" data-src-name="Scott Logic"><span class="v">▲</span><span><b>~4h vs ~32 min</b> na mesma tarefa pequena — o overhead é real (Scott Logic)</span></li>
+                            <li data-tip="Thoughtworks Technology Radar vol. 34 (nov/2025): SDD no anel Assess, não Adopt — 'os workflows permanecem elaborados e opinativos'. Isoform: manter spec e código em sincronia 'cria um imposto de manutenção que cresce com a complexidade'" data-src="https://www.thoughtworks.com/radar/techniques/spec-driven-development" data-src-name="Thoughtworks Radar · Isoform"><span class="v">▲</span><span><b>Ainda "Assess"</b> no Radar da Thoughtworks (nov/2025) — não é "Adopt"</span></li>
+                            <li data-tip="Nenhuma ferramenta SDD dispensa review humano do resultado. O que muda é o nível: revisa-se a spec e os testes, e amostra-se o código."><span class="v">▲</span><span><b>Ainda precisa de review</b> — a spec reduz, não elimina, a verificação</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-card fit">
+                        <h3>Onde encaixa na escada</h3>
+                        <div class="fit-ladder">
+                            <div class="fit-row enables"><b>7</b> Background Agents <span class="tag">exige spec</span></div>
+                            <div class="fit-row enables"><b>6</b> Harness Engineering <span class="tag">spec = eval</span></div>
+                            <div class="fit-row"><b>5</b> MCP &amp; Skills</div>
+                            <div class="fit-row core"><b>4</b> Compounding Engineering <span class="tag">SDD compõe</span></div>
+                            <div class="fit-row core"><b>3</b> Context Engineering <span class="tag">SDD nasce</span></div>
+                            <div class="fit-row"><b>2</b> Agent IDE</div>
+                        </div>
+                        <p style="font-size:0.76rem;color:var(--dim);line-height:1.5;margin-top:12px">Leitura desta palestra: SDD é a prática mais barata para sair do nível 2. E é pré-requisito para os níveis 6–7: sem spec não há critério para <em>eval</em>, nem tarefa segura para um agente em background.</p>
+                    </div>
+                </div>
+                <div class="quote-bar"><span>"We keep the generated code and delete the prompt…" — é como rasgar o código-fonte e versionar, com todo cuidado, o binário. A nova habilidade escassa é escrever a especificação que captura intenção e valores.</span><span class="qa">— Sean Grove, OpenAI · "The New Code", AI Engineer World's Fair 2025 · <a href="https://tessl.io/blog/the-most-valuable-developer-skill-in-2025-writing-code-specifications/" target="_blank" rel="noopener">fonte</a></span></div>
+            </div>
+        </div>
+
+        <!-- ⑪ COMO SUBIR DE NÍVEL -->
+        <div class="slide" id="s11">
+            <div style="width:100%;max-width:1240px;margin:0 auto">
+                <div class="label">Roadmap prático</div>
+                <h2 class="title" style="font-size:2.6rem;margin-bottom:16px">Como subir <span class="grad">um nível por trimestre.</span></h2>
+                <div class="ladder-grid">
+                    <div class="step-card"><div class="from-to">1 → 2</div><div class="st">Dê poder de edição</div><ul><li>Adote um agent IDE / CLI com permissão de editar e rodar</li><li>Comece por testes e refactors, não por features</li><li>Combine: ninguém faz merge sem ler o diff</li></ul><div class="kpi">Métrica: <b>% de PRs com assistência de agente</b></div></div>
+                    <div class="step-card"><div class="from-to">2 → 3</div><div class="st">Escreva o contexto uma vez</div><ul><li><code>AGENTS.md</code> / <code>CLAUDE.md</code> na raiz: stack, convenções, comandos, o que não fazer</li><li>Docs de arquitetura curtos e atuais</li><li>Revise o contexto em PR como se fosse código</li></ul><div class="kpi">Métrica: <b>retrabalho por tarefa</b> caindo</div></div>
+                    <div class="step-card"><div class="from-to">3 → 4</div><div class="st">Adote Spec-Driven</div><ul><li>Spec por feature: o quê, por quê, critérios de aceite</li><li>Plan e tasks gerados e revisados antes do código</li><li>Lições de review viram regra escrita no repo</li></ul><div class="kpi">Métrica: <b>acerto na 1ª tentativa</b></div></div>
+                    <div class="step-card"><div class="from-to">4 → 5</div><div class="st">Conecte os sistemas</div><ul><li>MCP servers para Jira, banco, observabilidade, docs</li><li>Skills reutilizáveis: deploy, runbook, review</li><li>Registro interno do que o agente pode acessar</li></ul><div class="kpi">Métrica: <b>tarefas resolvidas sem humano buscar dado</b></div></div>
+                    <div class="step-card"><div class="from-to">5 → 6</div><div class="st">Construa o harness</div><ul><li>Permissões e sandbox por agente; hooks que bloqueiam ações perigosas</li><li>Evals com a spec como gabarito; custo por tarefa medido</li><li>Observabilidade: traces, tokens, taxa de aceite</li></ul><div class="kpi">Métrica: <b>custo/tarefa</b> e <b>PRs aceitos sem alteração</b></div></div>
+                    <div class="step-card"><div class="from-to">6 → 7</div><div class="st">Tire o agente do IDE</div><ul><li>Agentes em CI: falhou o build → agente propõe fix</li><li>Issue com spec → PR em background</li><li>Fila de tarefas paralelas, cada uma no seu ambiente</li></ul><div class="kpi">Métrica: <b>PRs merged originados por agente</b></div></div>
+                    <div class="step-card"><div class="from-to">7 → 8</div><div class="st">Orquestre papéis</div><ul><li>Agentes com papéis coordenando-se entre si, sem gargalo central</li><li>Contratos entre agentes (schemas, critérios) e revisão adversarial</li><li>Humano aprova marcos; auditoria completa</li></ul><div class="kpi">Métrica: <b>incidentes por entrega autônoma</b></div></div>
+                    <div class="step-card" style="background:rgba(120,85,250,0.1);border-color:rgba(120,85,250,0.4)"><div class="from-to">regra de ouro</div><div class="st">Não pule degraus</div><ul><li>Nível 7 sem 3–4 = agentes rápidos gerando lixo em paralelo</li><li>Nível 6 sem 5 = guardrails sem nada para proteger</li><li>Custo e risco sobem junto: multiagente ≈ 15× os tokens de um chat</li><li>Suba um nível, meça, e só então o próximo</li></ul><div class="kpi">Pergunta-chave: <b>em qual nível está a sua empresa?</b></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑫ OBRIGADO -->
+        <div class="slide centered" id="s12">
+            <div class="thanks-wrap">
+                <div class="thanks-title">Obrigado!</div>
+                <div class="thanks-sub">Escaneie para acessar</div>
+                <div class="qr-row">
+                    <a href="https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=apresentacao&s=12" target="_blank" class="qr-card">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=apresentacao%26s=12&bgcolor=131313&color=7855fa" width="120" height="120" alt="Apresentação">
+                        <div class="qr-name">Apresentação</div>
+                        <div class="qr-sub">HTML interativo</div>
+                    </a>
+                    <a href="https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=speckit&s=12" target="_blank" class="qr-card">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=speckit%26s=12&bgcolor=131313&color=2cc4e0" width="120" height="120" alt="Spec Kit">
+                        <div class="qr-name">Spec Kit</div>
+                        <div class="qr-sub">GitHub · open source</div>
+                    </a>
+                    <a href="https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=linkedin&s=12" target="_blank" class="qr-card">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=linkedin%26s=12&bgcolor=131313&color=b3a1ff" width="120" height="120" alt="LinkedIn">
+                        <div class="qr-name">Marcelo Mendes</div>
+                        <div class="qr-sub">Palestrante · LinkedIn</div>
+                    </a>
+                </div>
+                <div class="thanks-footer">Nutanix · Tech Talk · 2026</div>
+            </div>
+        </div>
+
+    </div><!-- /slides-wrapper -->
+
+    <!-- NAV PILL -->
+    <div class="nav-pill">
+        <button class="nav-btn" onclick="prev()">← Anterior</button>
+        <div class="nav-dots" id="dots"></div>
+        <button class="nav-btn" onclick="next()">Próximo →</button>
+        <span class="slide-counter" id="counter">01/12</span>
+    </div>
+
+    <!-- Q&A -->
+    <a href="https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=perguntas&s=all" target="_blank" id="qa-qr" class="qa-qr">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://marcelomar21.github.io/apresentacao-8-niveis-nutanix/r.html?to=perguntas%26s=all&bgcolor=131313&color=2cc4e0" width="80" height="80" alt="QR">
+        <span>Perguntas</span>
+    </a>
+    <div class="qa-badge" id="qa-badge" onclick="toggleQA()">Q&amp;A <span class="qa-count" id="qa-count">0</span></div>
+    <div id="qa-panel">
+        <div class="qa-header"><span class="qa-title">Perguntas do público</span><button class="qa-close" onclick="toggleQA()">✕</button></div>
+        <div class="qa-list" id="qa-list"><div class="qa-empty" id="qa-empty">Nenhuma pergunta ainda...</div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+    // ── PARTICLES ──
+    (function(){
+        const c = document.getElementById('particles');
+        const ctx = c.getContext('2d');
+        function resize(){ c.width = innerWidth; c.height = innerHeight; }
+        resize(); addEventListener('resize', resize);
+        const P = Array.from({length:55}, () => ({
+            x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+            vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+            r: Math.random()*1.5+.5, a: Math.random()*.4+.15
+        }));
+        function frame(){
+            ctx.clearRect(0,0,c.width,c.height);
+            P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy;
+                if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+                if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0;
+            });
+            for(let i=0;i<P.length;i++) for(let j=i+1;j<P.length;j++){
+                const dx=P[i].x-P[j].x, dy=P[i].y-P[j].y, d=Math.hypot(dx,dy);
+                if(d<110){ ctx.beginPath(); ctx.strokeStyle=`rgba(120,85,250,${(1-d/110)*.25})`; ctx.lineWidth=.5;
+                    ctx.moveTo(P[i].x,P[i].y); ctx.lineTo(P[j].x,P[j].y); ctx.stroke(); }
+            }
+            P.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                ctx.fillStyle=`rgba(120,85,250,${p.a})`; ctx.fill(); });
+            requestAnimationFrame(frame);
+        }
+        frame();
+    })();
+
+    // ── SLIDES ──
+    let cur = 0;
+    const slides = [...document.querySelectorAll('.slide')];
+    const N = slides.length;
+    const SDD_SLIDE = slides.findIndex(s => s.id === 's9');
+
+    (function init(){
+        const d = document.getElementById('dots');
+        slides.forEach((_,i)=>{ const dot=document.createElement('div'); dot.className='nav-dot'+(i===0?' active':''); dot.onclick=()=>go(i); d.appendChild(dot); });
+        const h = parseInt((location.hash||'').replace('#s',''),10);
+        if (h >= 1 && h <= N) cur = h-1;
+        update();
+    })();
+
+    function update(){
+        slides.forEach((s,i)=>{ s.classList.remove('active','prev');
+            if(i===cur) s.classList.add('active'); else if(i<cur) s.classList.add('prev'); });
+        document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+        document.getElementById('progressLine').style.width = ((cur+1)/N*100)+'%';
+        document.getElementById('counter').textContent = String(cur+1).padStart(2,'0')+'/'+String(N).padStart(2,'0');
+        history.replaceState(null, '', '#s'+(cur+1));
+    }
+    function next(){ if(cur<N-1){cur++;update();} }
+    function prev(){ if(cur>0){cur--;update();} }
+    function go(i){ cur=i; update(); }
+
+    document.addEventListener('keydown', e=>{
+        if (e.target.matches('input,textarea')) return;
+        if(['ArrowRight',' ','Enter','PageDown'].includes(e.key)){e.preventDefault();next();}
+        if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    });
+    // swipe (mobile)
+    let tx=null; document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+    document.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>70){ dx<0?next():prev(); } tx=null; },{passive:true});
+
+    // ── CAROUSEL (escada) ──
+    function createCarousel(slideId, selector, interval, pauseSelector, reverse) {
+        let items = [...document.querySelectorAll(`#${slideId} ${selector}`)];
+        if (reverse) items = items.slice().reverse();
+        if (!items.length) return null;
+        const car = { items, iv: null, idx: -1, ms: interval };
+        car.show = function(i) {
+            this.items.forEach(a => a.classList.remove('ag-hl'));
+            if (i < 0 || i >= this.items.length) return;
+            const el = this.items[i]; el.classList.add('ag-hl');
+            const t = document.getElementById('tip'); const tipText = el.dataset.tip;
+            if (tipText && t) {
+                t.textContent = tipText; t.classList.remove('has-link'); t.classList.add('vis');
+                const r = el.getBoundingClientRect(); const tw = t.offsetWidth, th = t.offsetHeight;
+                let top = r.bottom + 10; if (top + th > innerHeight - 60) top = r.top - th - 10;
+                t.style.left = Math.max(10, Math.min(r.left + r.width/2 - tw/2, innerWidth - tw - 10)) + 'px';
+                t.style.top = top + 'px';
+            }
+        };
+        car.start = function() {
+            if (this.iv) return; this.idx = -1;
+            this.iv = setInterval(() => { this.idx++; if (this.idx >= this.items.length) this.idx = 0; this.show(this.idx); }, this.ms);
+            setTimeout(() => { this.idx = 0; this.show(0); }, 600);
+        };
+        car.stop = function() {
+            if (this.iv) { clearInterval(this.iv); this.iv = null; }
+            this.items.forEach(a => a.classList.remove('ag-hl'));
+            const t = document.getElementById('tip'); if (t) t.classList.remove('vis'); this.idx = -1;
+        };
+        const zone = document.querySelector(`#${slideId} ${pauseSelector}`);
+        if (zone) {
+            zone.addEventListener('mouseenter', () => { if (car.iv) { clearInterval(car.iv); car.iv = null; } car.items.forEach(a => a.classList.remove('ag-hl')); });
+            zone.addEventListener('mouseleave', () => { if (document.getElementById(slideId)?.classList.contains('active')) car.start(); });
+        }
+        return car;
+    }
+    const carousels = { s3: createCarousel('s3', '.stair', 2600, '.staircase', true) };
+
+    // ── SLIDE 9: SDD TERMINAL ──
+    function addLine(body, html) {
+        const s = document.createElement('span'); s.className = 't-out'; s.style.display = 'block';
+        s.innerHTML = html || '&nbsp;'; body.appendChild(s); body.scrollTop = body.scrollHeight;
+    }
+    const P  = (c) => `<span class="t-prompt">~/portal$</span> <span class="t-cmd">${c}</span>`;
+    const AG = (n,t) => `  <span style="color:#b3a1ff;font-weight:600">${n}:</span> <span style="color:#b4b4bc">${t}</span>`;
+    const OK = (t) => `  <span style="color:#92dd23">✓</span> ${t}`;
+    const SP = (t) => `  <span style="color:#7855fa">◉</span> <span style="color:#9c9ca6">${t}</span>`;
+    const HM = (t) => `  <span style="color:#5f5f6a">→</span> <span style="color:#c8c8d0">${t}</span>`;
+    const WN = (t) => `  <span style="color:#ff7a5c">!</span> <span style="color:#c8c8d0">${t}</span>`;
+
+    const S9_STAGES = [
+      { step: 0, file: 'constitution.md', delays: [0,500,1100,1500,1700], lines: [
+        P('specify init portal-autoatendimento --ai claude'),
+        OK('.specify/ criado · templates · scripts'),
+        P('/speckit.constitution'),
+        OK('<span style="color:#e6e6ee">constitution.md</span> — 6 princípios inegociáveis'),
+        ''
+      ], docAt: 3, html: `<div class="dh1"># Constitution — Portal de Autoatendimento</div><div class="dmeta">versão 1.0 · ratificada pelo time · vale para todo agente</div><div class="dh2">## Princípios</div><div>I. <b>Test-first</b>: nenhum código sem teste de aceite escrito antes</div><div>II. <b>API-first</b>: contrato OpenAPI antes do handler</div><div>III. <b>Multi-tenant por padrão</b>: RLS em toda tabela</div><div>IV. <b>Observabilidade</b>: log estruturado + trace em toda rota</div><div>V. <b>Simplicidade</b>: sem abstração antes do 3º uso</div><div>VI. <b>Segurança</b>: OWASP Top 10 checado em todo PR</div><div class="dh2">## Governança</div><div>Emenda exige PR + aprovação de 2 mantenedores</div>` },
+
+      { step: 1, file: 'specs/001-reset-senha/spec.md', delays: [0,500,1200,1900,2300,2500], lines: [
+        P('/speckit.specify "Usuário redefine a senha sem abrir chamado, com verificação por e-mail e limite de tentativas"'),
+        AG('Agente','Lendo constitution.md + contexto do repo...'),
+        SP('Extraindo user stories, requisitos e critérios de aceite...'),
+        WN('2 pontos marcados como [NEEDS CLARIFICATION]'),
+        OK('<span style="color:#e6e6ee">spec.md</span> — 3 stories · 9 FR · 6 critérios · 0 decisões técnicas'),
+        ''
+      ], docAt: 4, html: `<div class="dh1"># Spec 001 — Redefinição de senha</div><div class="dmeta">branch: 001-reset-senha · status: draft · sem detalhes de implementação</div><div class="dh2">## User Stories</div><div><b>US1</b> Como usuário, quero redefinir minha senha por e-mail, para recuperar acesso sem chamado.</div><div><b>US2</b> Como segurança, quero limite de tentativas, para bloquear força bruta.</div><div><b>US3</b> Como suporte, quero auditoria, para investigar incidentes.</div><div class="dh2">## Requisitos funcionais</div><div>FR-01 Link de redefinição expira em <span class="dwarn">[NEEDS CLARIFICATION: 15 ou 60 min?]</span></div><div>FR-02 Máx. 5 tentativas por hora por conta</div><div>FR-03 Notificar e-mail anterior após troca</div><div>FR-04 Senha nova segue política <span class="dwarn">[NEEDS CLARIFICATION: qual?]</span></div><div class="dh2">## Critérios de aceite</div><div><span class="dok">✓</span> Dado token válido, quando redefine, então login funciona com a senha nova</div><div><span class="dok">✓</span> Dado token expirado, quando redefine, então erro claro sem vazar existência da conta</div><div><span class="dok">✓</span> Dada 6ª tentativa na hora, então bloqueio + evento de auditoria</div>` },
+
+      { step: 2, file: 'specs/001-reset-senha/spec.md (v2)', delays: [0,500,1000,1500,1900,2100], lines: [
+        P('/speckit.clarify'),
+        AG('Agente','Q1: Link expira em 15 ou 60 minutos?'),
+        HM('"15 minutos — padrão de segurança do banco"'),
+        AG('Agente','Q2: Política de senha: a mesma do login corporativo?'),
+        HM('"Sim, reusar a policy existente (12+ chars, 1 símbolo)"'),
+        OK('spec.md atualizada — 0 pendências · seção Clarifications adicionada'),
+        ''
+      ], docAt: 5, html: `<div class="dh1"># Spec 001 — Redefinição de senha</div><div class="dmeta">status: clarified · 2 decisões registradas</div><div class="dh2">## Clarifications (2026-09-03)</div><div>Q: Expiração do link? → <span class="dok">15 min</span> (padrão de segurança)</div><div>Q: Política de senha? → <span class="dok">reusar policy corporativa</span> (12+ chars, 1 símbolo)</div><div class="dh2">## Requisitos funcionais</div><div>FR-01 Link de redefinição expira em <span class="dok">15 minutos</span></div><div>FR-02 Máx. 5 tentativas por hora por conta</div><div>FR-03 Notificar e-mail anterior após troca</div><div>FR-04 Senha nova segue <span class="dok">policy corporativa existente</span></div><div class="dmeta" style="margin-top:8px">Nenhuma decisão de stack aqui — isso é do plan.</div>` },
+
+      { step: 3, file: 'specs/001-reset-senha/plan.md', delays: [0,500,1100,1700,2100,2300], lines: [
+        P('/speckit.plan "Next.js + Supabase Auth; e-mail via Resend; sem lib nova"'),
+        AG('Agente','Checando constitution: test-first ✓ · API-first ✓ · RLS ✓'),
+        SP('Gerando data-model.md, contracts/openapi.yaml, research.md...'),
+        SP('Constitution check: 6/6 princípios atendidos'),
+        OK('<span style="color:#e6e6ee">plan.md</span> + 3 artefatos · 2 tabelas · 3 endpoints'),
+        ''
+      ], docAt: 4, html: `<div class="dh1"># Plan 001 — Redefinição de senha</div><div class="dmeta">stack: Next.js 15 · Supabase Auth · Resend · vitest</div><div class="dh2">## Constitution Check</div><table class="dtbl"><tr><th>Princípio</th><th>Como</th></tr><tr><td>Test-first</td><td>testes de aceite gerados de cada critério</td></tr><tr><td>API-first</td><td>contracts/openapi.yaml antes do handler</td></tr><tr><td>Multi-tenant</td><td>RLS em password_reset_tokens</td></tr></table><div class="dh2">## Data model</div><div>password_reset_tokens(id, user_id, token_hash, expires_at, used_at)</div><div>auth_attempts(id, user_id, kind, created_at) — janela 1h</div><div class="dh2">## Contratos</div><div>POST /auth/reset/request · POST /auth/reset/confirm · GET /auth/reset/status</div><div class="dh2">## Decisões</div><div>• token = SHA-256 do segredo; nunca armazenar em claro</div><div>• rate limit no edge, não no banco</div>` },
+
+      { step: 4, file: 'specs/001-reset-senha/tasks.md', delays: [0,500,1100,1500,1700], lines: [
+        P('/speckit.tasks'),
+        SP('Derivando tarefas do plan: setup → testes → modelos → endpoints → integração...'),
+        OK('<span style="color:#e6e6ee">tasks.md</span> — 18 tarefas · 7 marcadas [P] (paralelizáveis)'),
+        HM('Cada tarefa cita o critério de aceite que fecha'),
+        ''
+      ], docAt: 2, html: `<div class="dh1"># Tasks 001 — Redefinição de senha</div><div class="dmeta">18 tarefas · [P] = pode rodar em paralelo · ordem por dependência</div><div class="dh2">## Fase 1 — Setup</div><div>T001 Migration password_reset_tokens + RLS</div><div>T002 [P] Migration auth_attempts</div><div class="dh2">## Fase 2 — Testes primeiro (devem falhar)</div><div>T003 [P] Teste de contrato POST /auth/reset/request</div><div>T004 [P] Teste de contrato POST /auth/reset/confirm</div><div>T005 [P] Teste de aceite: token expirado não vaza conta (AC-2)</div><div>T006 [P] Teste de aceite: 6ª tentativa bloqueia (AC-3)</div><div class="dh2">## Fase 3 — Implementação</div><div>T007 Serviço de token (hash, expiração 15 min)</div><div>T008 Handler request + envio Resend</div><div>T009 Handler confirm + policy corporativa</div><div>T010 Rate limit no edge</div><div class="dmeta">... T011–T018: auditoria, notificação, docs, polish</div>` },
+
+      { step: 5, file: 'PR #142 — feat(auth): redefinição de senha', delays: [0,500,1200,2000,2600,3000,3200], lines: [
+        P('/speckit.implement'),
+        SP('Executando T001–T018 respeitando dependências (7 em paralelo)...'),
+        OK('Fase 2: 4 testes escritos → 4 falhando (esperado)'),
+        OK('Fase 3: 4 endpoints + serviços → <span style="color:#2cc4e0">86/86 testes passando</span>'),
+        OK('Constitution check final: 6/6 · OWASP checklist ✓'),
+        OK('<span style="color:#e6e6ee">PR #142</span> aberto — descrição gerada da spec · 14 arquivos · +612 −8'),
+        ''
+      ], docAt: 5, html: `<div class="dh1"># PR #142 — feat(auth): redefinição de senha</div><div class="dmeta">spec 001 · plan v1 · 18/18 tasks · 86 testes</div><div class="dh2">## O que revisar (humano)</div><div><span class="dok">✓</span> A spec descreve o comportamento certo? (5 min)</div><div><span class="dok">✓</span> Os critérios de aceite viraram testes? (3 min)</div><div><span class="dok">✓</span> Decisões do plan são aceitáveis? (token hash, rate limit no edge)</div><div><span class="dwarn">●</span> Amostra de código: handler confirm + migration RLS</div><div class="dh2">## Rastreabilidade</div><table class="dtbl"><tr><th>Critério</th><th>Teste</th><th>Task</th></tr><tr><td>AC-1</td><td>reset.confirm.test.ts</td><td>T004, T009</td></tr><tr><td>AC-2</td><td>reset.expired.test.ts</td><td>T005, T007</td></tr><tr><td>AC-3</td><td>reset.ratelimit.test.ts</td><td>T006, T010</td></tr></table><div class="dmeta" style="margin-top:6px">Próxima feature começa com a spec — e com tudo que esta ensinou.</div>` }
+    ];
+
+    let s9Stage = -1, s9Auto = false, s9Timers = [];
+    function s9ShowDoc(stage) {
+        const fn = document.getElementById('doc-filename'); const bd = document.getElementById('doc-body');
+        if (fn) fn.textContent = stage.file;
+        if (bd) { bd.style.opacity = '0'; setTimeout(() => { bd.innerHTML = stage.html; bd.style.opacity = '1'; bd.scrollTop = 0; }, 150); }
+        document.querySelectorAll('#sdd-flow .sdd-step').forEach(el => el.classList.toggle('on', parseInt(el.dataset.stage) === stage.step));
+    }
+    function s9Render(upTo, animate) {
+        const b = document.getElementById('t9-body'); if (!b) return; b.innerHTML = '';
+        for (let i = 0; i <= upTo; i++) {
+            const st = S9_STAGES[i];
+            if (i < upTo || !animate) { st.lines.forEach(l => addLine(b, l)); }
+            else { st.lines.forEach((l, j) => { const tid = setTimeout(() => { addLine(b, l); if (j === st.docAt) s9ShowDoc(st); }, st.delays[j]); s9Timers.push(tid); }); }
+            if (i < upTo && i === upTo - 1) s9ShowDoc(S9_STAGES[upTo - 1]);
+        }
+        if (!animate) s9ShowDoc(S9_STAGES[upTo]);
+    }
+    function s9AutoNext() {
+        if (!s9Auto) return; s9Stage++;
+        if (s9Stage >= S9_STAGES.length) {
+            const b = document.getElementById('t9-body');
+            if (b) { const s = document.createElement('span'); s.className = 't-out'; s.style.display = 'block';
+                s.innerHTML = `<span class="t-prompt">~/portal$</span> <span class="t-cur"></span>`; b.appendChild(s);
+                const msg = document.createElement('span'); msg.className = 't-out'; msg.style.display = 'block';
+                msg.innerHTML = `<span style="color:#b3a1ff;font-weight:600;font-size:0.95em;margin-top:8px;display:inline-block">Nível 4 alcançado: a próxima spec herda a constitution, o plan e as lições desta.</span>`;
+                b.appendChild(msg); b.scrollTop = b.scrollHeight; }
+            s9Auto = false; return;
+        }
+        s9Render(s9Stage, true);
+        const st = S9_STAGES[s9Stage]; const lastDelay = st.delays[st.delays.length - 1];
+        const tid = setTimeout(s9AutoNext, lastDelay + 700); s9Timers.push(tid);
+    }
+    function runSlide9() { s9Stage = -1; s9Auto = true; s9AutoNext(); }
+    function resetSlide9() {
+        s9Timers.forEach(clearTimeout); s9Timers = []; s9Stage = -1; s9Auto = false;
+        const b = document.getElementById('t9-body'); if (b) b.innerHTML = '';
+        const fn = document.getElementById('doc-filename'); const bd = document.getElementById('doc-body');
+        if (fn) fn.textContent = 'aguardando...';
+        if (bd) bd.innerHTML = '<span style="color:#5f5f6a">O artefato gerado aparece aqui...</span>';
+        document.querySelectorAll('#sdd-flow .sdd-step').forEach(el => el.classList.remove('on'));
+    }
+    document.addEventListener('keydown', e => {
+        if (cur !== SDD_SLIDE) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); s9Auto = false; s9Timers.forEach(clearTimeout); s9Timers = []; if (s9Stage < S9_STAGES.length - 1) { s9Stage++; s9Render(s9Stage, true); } }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); s9Auto = false; s9Timers.forEach(clearTimeout); s9Timers = []; if (s9Stage > 0) { s9Stage--; s9Render(s9Stage, false); } }
+        else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); e.stopPropagation(); if (!s9Auto && s9Stage < S9_STAGES.length - 1) { s9Auto = true; s9AutoNext(); } }
+    }, true);
+    // clique numa etapa do fluxo pula para ela
+    document.querySelectorAll('#sdd-flow .sdd-step').forEach(el => el.addEventListener('click', () => {
+        s9Auto = false; s9Timers.forEach(clearTimeout); s9Timers = [];
+        s9Stage = parseInt(el.dataset.stage); s9Render(s9Stage, true);
+    }));
+
+    // update() remove e adiciona classes no mesmo tick → vários records por slide; só reagimos à TRANSIÇÃO
+    const animObserver = new MutationObserver(muts => {
+        const seen = new Set();
+        muts.forEach(m => {
+            const el = m.target; if (seen.has(el)) return; seen.add(el);
+            const active = el.classList.contains('active');
+            const was = el.dataset.wasActive === '1';
+            if (active === was) return;
+            el.dataset.wasActive = active ? '1' : '0';
+            if (carousels[el.id]) { if (active) carousels[el.id].start(); else carousels[el.id].stop(); }
+            if (el.id === 's9') { if (active) runSlide9(); else resetSlide9(); }
+        });
+    });
+    ['s3','s9'].forEach(id => { const el = document.getElementById(id); if (el) animObserver.observe(el, { attributes: true, attributeFilter: ['class'] }); });
+
+    // ── TOOLTIPS DOS DEGRAUS ──
+    const STAIR_TIPS = {
+        'Tab Complete':            '① Autocomplete de linha/bloco (Copilot inline, Cursor Tab). Você decide 100%; a IA encurta a digitação. Ganho em boilerplate, zero mudança de processo.',
+        'Agent IDE':               '② Um agente lê o repo, edita vários arquivos e roda comandos (Cursor, Claude Code, Codex CLI). Rápido para protótipo — é onde o vibe coding mora.',
+        'Context Engineering':     '③ AGENTS.md / CLAUDE.md, regras e docs curados: você projeta o que entra na janela de contexto. O agente para de reinventar o projeto a cada prompt.',
+        'Compounding Engineering': '④ Loop Plan → Work → Review → Codify: cada tarefa termina codificando a lição em regras que toda sessão futura lê. Cada tarefa deixa a próxima mais barata. Spec-Driven Development compõe aqui.',
+        'MCP & Skills':            '⑤ Ferramentas padronizadas (MCP) e procedimentos reutilizáveis (Skills): o agente consulta Jira, banco, observabilidade — em vez de adivinhar.',
+        'Harness Engineering':     '⑥ "Give the agent the feedback loop, not just the editor": permissões, sandboxes, evals, guardrails, observabilidade e custo. O agente verifica e corrige o próprio trabalho.',
+        'Background Agents':       '⑦ Agentes assíncronos que exploram, planejam e implementam sem aprovação prévia do plano; um orquestrador central roteia trabalho para vários agentes/modelos. Codex cloud, Copilot coding agent, Jules, Devin. Exigem spec e harness.',
+        'Autonomous Agent Teams':  '⑧ Agentes coordenam-se diretamente entre si (reivindicam tarefas, compartilham descobertas, resolvem conflitos) sem orquestrador central. Claude Code Agent Teams em preview desde fev/2026. Fronteira: caro, lento e experimental.',
+    };
+    document.querySelectorAll('.stair').forEach(el => {
+        const label = el.querySelector('.stair-label')?.textContent.trim();
+        if (label && STAIR_TIPS[label]) el.dataset.tip = STAIR_TIPS[label];
+    });
+
+    // ── TOOLTIP GLOBAL ──
+    const tip = document.createElement('div'); tip.id = 'tip'; document.body.appendChild(tip);
+    let tipTarget = null;
+    document.addEventListener('mouseover', e => {
+        const el = e.target.closest('[data-tip]'); if (!el) return;
+        tipTarget = el; const src = el.dataset.src; const srcName = el.dataset.srcName;
+        if (src) { tip.innerHTML = el.dataset.tip + `<span class="tip-src">Fonte: <a href="${src}" target="_blank" rel="noopener">${srcName || 'ver fonte'} ↗</a></span>`; tip.classList.add('has-link'); }
+        else { tip.textContent = el.dataset.tip; tip.classList.remove('has-link'); }
+        tip.classList.add('vis');
+    });
+    document.addEventListener('mousemove', e => {
+        if (!tip.classList.contains('has-link') || !e.target.closest('#tip')) {
+            const x = e.clientX, y = e.clientY; const tw = tip.offsetWidth, th = tip.offsetHeight;
+            tip.style.left = Math.min(x + 14, innerWidth - tw - 10) + 'px';
+            tip.style.top = (y - th - 10 < 6 ? y + 16 : y - th - 10) + 'px';
+        }
+    });
+    document.addEventListener('mouseout', e => {
+        const leaving = e.target, entering = e.relatedTarget;
+        if (leaving.closest('#tip') && entering && entering.closest('[data-tip]') === tipTarget) return;
+        if (leaving.closest('[data-tip]') === tipTarget && entering && entering.closest('#tip')) return;
+        if (leaving.closest('[data-tip]') || leaving.closest('#tip')) {
+            if (!entering || (!entering.closest('[data-tip]') && !entering.closest('#tip'))) { tip.classList.remove('vis', 'has-link'); tipTarget = null; }
+        }
+    });
+    document.addEventListener('click', e => {
+        const el = e.target.closest('[data-src]');
+        if (el && el.dataset.src && !e.target.closest('a')) window.open(el.dataset.src, '_blank');
+    });
+
+    // ── Q&A REALTIME (Supabase) ──
+    const SUPA_URL = 'https://ubjbawkcqsvumpcxkirb.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViamJhd2tjcXN2dW1wY3hraXJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDU0NDIsImV4cCI6MjA4OTU4MTQ0Mn0.JDvG7mPW7vqrAsXzcPhtFwDtO8mOvbUZliHrxXF5gPQ';
+    const QA_SINCE = '2026-09-01T00:00:00Z';   // só perguntas deste evento (a tabela é compartilhada)
+    const QA_CHANNEL = 'niveis-qa';
+
+    const supaClient = supabase.createClient(SUPA_URL, SUPA_KEY);
+    let qaCount = 0, lastQAId = 0;
+    function toggleQA() { document.getElementById('qa-panel').classList.toggle('open'); }
+    async function deleteQA(id, el) {
+        const item = el.closest('.qa-item'); item.style.opacity = '0.3';
+        const { error } = await supaClient.from('perguntas').delete().eq('id', id);
+        if (error) { console.error('Erro ao deletar pergunta:', error); item.style.opacity = '1'; return; }
+        item.remove(); qaCount = Math.max(0, qaCount - 1); document.getElementById('qa-count').textContent = qaCount;
+    }
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function addQAItem(p) {
+        const list = document.getElementById('qa-list'); const empty = document.getElementById('qa-empty');
+        if (empty) empty.remove(); if (document.getElementById('qa-' + p.id)) return;
+        const div = document.createElement('div'); div.className = 'qa-item'; div.id = 'qa-' + p.id; div.dataset.votos = p.votos || 0;
+        const time = new Date(p.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        div.innerHTML = `<div class="qa-nome">${esc(p.nome) || 'Anônimo'}<button class="qa-del" onclick="deleteQA(${p.id},this)" title="Excluir">🗑</button></div><div class="qa-texto">${esc(p.pergunta)}</div><div class="qa-votos">▲ <span class="qa-votos-count">${p.votos || 0}</span> votos</div><div class="qa-time">${time}</div>`;
+        list.prepend(div); qaCount++; document.getElementById('qa-count').textContent = qaCount;
+    }
+    function sortQAList() {
+        const list = document.getElementById('qa-list'); const items = Array.from(list.querySelectorAll('.qa-item'));
+        items.sort((a, b) => (parseInt(b.dataset.votos) || 0) - (parseInt(a.dataset.votos) || 0)); items.forEach(el => list.appendChild(el));
+    }
+    function updateQAVote(id, newVotos) {
+        const item = document.getElementById('qa-' + id); if (!item) return;
+        item.dataset.votos = newVotos; const c = item.querySelector('.qa-votos-count'); if (c) c.textContent = newVotos; sortQAList();
+    }
+    (async () => {
+        const { data } = await supaClient.from('perguntas').select('*').gte('created_at', QA_SINCE)
+            .order('votos', { ascending: false }).order('created_at', { ascending: false });
+        if (data && data.length) { lastQAId = Math.max(...data.map(p => p.id)); data.reverse().forEach(addQAItem); sortQAList(); }
+    })();
+    supaClient.channel(QA_CHANNEL)
+        .on('broadcast', { event: 'nova-pergunta' }, ({ payload }) => { if (payload && payload.id > lastQAId) { lastQAId = payload.id; addQAItem(payload); sortQAList(); } })
+        .on('broadcast', { event: 'voto-pergunta' }, ({ payload }) => { if (payload) updateQAVote(payload.id, payload.votos); })
+        .subscribe();
+    document.addEventListener('keydown', e => { if (e.target.matches('input,textarea')) return; if (e.key === 'q' || e.key === 'Q') toggleQA(); });
+    </script>
+</body>
+</html>
